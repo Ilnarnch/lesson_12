@@ -1,46 +1,30 @@
 
 <?php
 header('Content-type: text/html; charset=utf-8');
-$name = "Ильнар";
-$age = 28;
-echo 'Меня зовут '.$name.'. Мне '.$age.' лет.';
+error_reporting(E_ERROR|E_WARNING|E_PARSE|E_NOTICE);
+ini_set('display_errors',1);
 
-unset($name,$age);
-?>
-<br>
+$date = array(
+    mt_rand(1, time()),
+    mt_rand(1, time()),
+    mt_rand(1, time()),
+    mt_rand(1, time()),
+    mt_rand(1, time())
+    );
 
-<?php
-define("CITY","Набережные Челны");
-if (defined("CITY")) {
-    echo 'Значение константы: '.CITY.'.';
-};
-define("CITY","San Francisco"); //Попытка изменения значения созданной константы.
-?>
 
-<br>
-<?php
-$book = array(
-    "title" => "\"Путь Кайзен\"",
-    "author" => "Робертом Маурером"
-);
-$book["pages"]=188;
-echo 'Недавно я прочитал книгу '.$book["title"]. ' написанную автором '.$book["author"].', я осилил все '.$book["pages"].' страниц, мне она очень понравилась.'
-?>
-<br>
+//print_r($date);
 
-<?php
-$book1 = array(
-    "title" => "\"Путь Кайзен\"",
-    "author" => "Робертом Маурером",
-    "pages" => 188
-);
-$book2 = array(
-    "title" => "\"Поток\"",
-    "author" => "Михай Чиксентмихайи",
-    "pages" => 357
-);
-$books = array ($book1, $book2);
-echo 'Недавно я прочитал книги '.$books[0]["title"].' и '.$books[1]["title"]
-        .', написанная соответственно авторами '.$books[0]["author"].' и '.$books[1]["author"].', я осилил в сумме '
-        .($books[0]["pages"] + $books[1]["pages"]).' страниц.'
-?>
+echo 'Наименьший день: '. min(date("j",$date[0]), date("j",$date[1]), date("j",$date[2]), date("j",$date[3]), date("j", $date[4])). "<br>";
+echo 'Наибольший месяц: '. max(date("m", $date[0]), date("m", $date[1]), date("m", $date[2]), date("m", $date[3]), date("m", $date[4])). "<br>";
+
+sort($date);
+//print_r($date);
+
+echo $selected = array_pop($date);
+echo "<br>";
+echo date("d.m.y H:i:s",$selected);
+echo "<br>";
+date_default_timezone_set("America/New_York");
+echo "<br>";
+echo date_default_timezone_get();
