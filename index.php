@@ -13,13 +13,34 @@ $date = array(
     );
 
 
-//print_r($date);
+  //print_r($date);
 
-echo 'Наименьший день: '. min(date("j",$date[0]), date("j",$date[1]), date("j",$date[2]), date("j",$date[3]), date("j", $date[4])). "<br>";
-echo 'Наибольший месяц: '. max(date("m", $date[0]), date("m", $date[1]), date("m", $date[2]), date("m", $date[3]), date("m", $date[4])). "<br>";
+echo 'Наименьший день: ';
+$min_j = date("j", $date[0]);
+foreach ($date as $value) {
+    if ($min_j > (date("j", $value)))
+        $min_j = (date("j", $value));
+}
+echo $min_j;
+
+echo "<br>";
+
+//echo 'Наименьший день: '. min(date("j",$date[0]), date("j",$date[1]), date("j",$date[2]), date("j",$date[3]), date("j", $date[4])). "<br>";
+
+echo "Наибольший месяц: ";
+$min_m = date("m", $date[0]);
+foreach ($date as $value) {
+    if ($min_m < date("m", $value))
+        $min_m = date("m", $value);
+};
+echo $min_m ;
+
+echo "<br>";
+
+//echo 'Наибольший месяц: '. max(date("m", $date[0]), date("m", $date[1]), date("m", $date[2]), date("m", $date[3]), date("m", $date[4])). "<br>";
 
 sort($date);
-//print_r($date);
+  //print_r($date);
 
 echo $selected = array_pop($date);
 echo "<br>";
