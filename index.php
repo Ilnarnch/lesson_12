@@ -34,42 +34,52 @@ echo "<br>";
 echo "<h3> Корзина: </h3>";
 function parse_basket ($basket) 
 {
-
+    global $information,          
+           $total;                  // Переменная для подсчета ИТОГО
+    
+           $information = array();  // массив для сбора $information (Уведомлений)
+           $total = 0;              
+           
     foreach($basket as $names=> $params)
-        {
-        
-        $information = 'Приятных покупок!';
+        {      
+
         echo $names;
         echo "<br>\n";
-//        print_r($params);
-        
-          if($names = 'игрушка детская велосипед')          //если он заказал "игрушка детская велосипед" в количестве >=3 штук, 
+//       print_r($params); 
+       static $count ;
+          if($names == 'игрушка детская велосипед')          //если он заказал "игрушка детская велосипед" в количестве >=3 штук, 
                 {                                           //то на эту позицию ему автоматически дается скидка 30%
                 if($params['количество заказано']>=3)
                     {
-                    $params['diskont'] = 'diskont3'; 
+                    $params['diskont'] = 'diskont3';
+                    echo "<p><b>Скидка:</b> При заказе \"игрушка детская велосипед\" от 3 штук на эту позицию дается скидка 30%</p>";
                     }
                 }
                 
-        if ($params['осталось на складе']>$params['количество заказано']) //извещение покупателя о том, что нужного количества 
-            {                                                            //товара не оказалось на складе
-            $discount = discount($params['цена'], $params['количество заказано'], $params['diskont']);  
+        if ($params['осталось на складе']>$params['количество заказано']) 
+            {                                                            
+            $discount = discount($params['цена'], $params['количество заказано'], $params['diskont']);
+            $params['осталось на складе'] = $params['количество заказано'];    
+            }
+        elseif ($params['осталось на складе']>0)                                                                                      
+            {                                                            
+            $discount = discount($params['цена'], $params['осталось на складе'], $params['diskont']);
+            $information[] = 'Вы можете заказать "' . $names .'" - ' . $params['осталось на складе'] . ' шт.';
             }
         else 
             {
             $discount['skidka'] = 0;
             $discount['price'] = 0;
             $discount['price_total'] = 0;
-            $information = 'Вы не можете заказать товара больше чем есть на складе!';
-            }  
+            $information[] = 'К сожалению товара "'.$names  .  '" нет на складе.';
+            }                               
           
-        echo 'Цена за единицу товара: ' . $params['цена']. 'руб | Скидка: ' .$discount['skidka'] . 
+        echo 'Цена за единицу товара: ' . $params['цена']. ' руб | Скидка: ' .$discount['skidka'] . 
                 ' | Цена со скидкой: '. $discount['price'] . ' | Количество заказано: ' . $params['количество заказано'] . 
-                ' | На складе: ' . $params['осталось на складе'] . ' | ИТОГО: ' . $discount['price_total'] ;
+                ' | На складе: ' . $params['осталось на складе'] . ' | Стоимость: ' . $discount['price_total'] . ' руб.';
         echo "<br>";
-        echo "<h4> Уведомления: </h4>" . $information; 
-        echo "<br><br>";
         echo "<hr>";
+        $total += $discount['price_total'];
     }
 }
 
@@ -86,6 +96,16 @@ function discount($price, $amount, $diskont)
 
 parse_basket($bd);
 
+echo "<h4> ИТОГО: $total руб.</h4>"; 
 
-echo "<h3> Скидки: </h3>";
-echo 'При заказе "игрушка детская велосипед" в количестве >=3 штук, то на эту позицию дается скидка 30%';
+
+
+echo "<h3> Уведомления: </h3>"; 
+
+foreach ($information as $value){
+    if($value <> '') 
+        {
+        echo $value . "<br>";
+        }
+}
+
