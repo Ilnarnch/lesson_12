@@ -29,16 +29,22 @@ diskont = diskont'.  mt_rand(0, 2).';
 $bd=  parse_ini_string($ini_string, true);
 //print_r($bd);
 
+$total_order = 0;           // Переменная для подсчета общего количества товара
+
 echo "<br>";
 
 echo "<h3> Корзина: </h3>";
 function parse_basket ($basket) 
 {
     global $information,          
-           $total;                  // Переменная для подсчета ИТОГО
+           $total,                  // Переменная для подсчета ИТОГО
+           $flag,
+           $product_name;           // массив для секции ИТОГО      
     
            $information = array();  // массив для сбора $information (Уведомлений)
-           $total = 0;              
+           $total = 0;    
+           $flag = false;
+
            
     foreach($basket as $names=> $params)
         {      
@@ -52,34 +58,38 @@ function parse_basket ($basket)
                 if($params['количество заказано']>=3)
                     {
                     $params['diskont'] = 'diskont3';
-                    echo "<p><b>Скидка:</b> При заказе \"игрушка детская велосипед\" от 3 штук на эту позицию дается скидка 30%</p>";
+                    $flag = true;
                     }
                 }
                 
-        if ($params['осталось на складе']>$params['количество заказано']) 
+        if ($params['осталось на складе']>=$params['количество заказано']) 
             {                                                            
             $discount = discount($params['цена'], $params['количество заказано'], $params['diskont']);
-            $params['осталось на складе'] = $params['количество заказано'];    
+            $params['осталось на складе'] = $params['количество заказано']; 
+            $product_name[$names] = $params['количество заказано'];
             }
         elseif ($params['осталось на складе']>0)                                                                                      
             {                                                            
             $discount = discount($params['цена'], $params['осталось на складе'], $params['diskont']);
             $information[] = 'Вы можете заказать "' . $names .'" - ' . $params['осталось на складе'] . ' шт.';
+            $product_name[$names] = $params['осталось на складе'];
             }
         else 
             {
             $discount['skidka'] = 0;
             $discount['price'] = 0;
             $discount['price_total'] = 0;
-            $information[] = 'К сожалению товара "'.$names  .  '" нет на складе.';
+            $information[] = 'К сожалению товара "' . $names  .  '" нет на складе.';
             }                               
           
-        echo 'Цена за единицу товара: ' . $params['цена']. ' руб | Скидка: ' .$discount['skidka'] . 
+        echo 'Цена за единицу товара: ' . $params['цена']. ' руб ' . "<br>" . 'Скидка: ' .$discount['skidka'] . 
                 ' | Цена со скидкой: '. $discount['price'] . ' | Количество заказано: ' . $params['количество заказано'] . 
                 ' | На складе: ' . $params['осталось на складе'] . ' | Стоимость: ' . $discount['price_total'] . ' руб.';
         echo "<br>";
         echo "<hr>";
+        
         $total += $discount['price_total'];
+      
     }
 }
 
@@ -96,8 +106,21 @@ function discount($price, $amount, $diskont)
 
 parse_basket($bd);
 
-echo "<h4> ИТОГО: $total руб.</h4>"; 
+foreach($product_name as $value)  // Цикл для подсчета общего количества товара
+    {
+        $total_order += $value;
+    }
 
+echo "<h4> ИТОГО:</h4>";
+    foreach($product_name as $key => $val)
+            {
+                echo 'Товара "' . $key . '" заказно - ' . $val . ' шт.' . "<br>";
+            } 
+            
+ echo "<b>Общая сумма заказа:</b> $total руб." . "<br>" . 
+                
+        "<b>Общее количество товара:</b>  $total_order " .' шт.' . "<br>" ;
+        
 
 
 echo "<h3> Уведомления: </h3>"; 
@@ -109,3 +132,7 @@ foreach ($information as $value){
         }
 }
 
+if ($flag)
+    {
+        echo "<h3> Скидки: </h3>" . 'При заказе "игрушка детская велосипед" от 3 штук на эту позицию дается скидка 30%</p>';
+    }
