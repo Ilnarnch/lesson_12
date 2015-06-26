@@ -1,4 +1,5 @@
 <?php
+
 error_reporting(E_ERROR|E_WARNING|E_PARSE|E_NOTICE);
 ini_set('display_errors',1);
 header('Content-type: text/html; charset=utf-8');
@@ -36,23 +37,25 @@ echo "<br>";
 echo "<h3> Корзина: </h3>";
 function parse_basket ($basket) 
 {
+    
+    
     global $information,          
            $total,                  // Переменная для подсчета ИТОГО
            $flag,
-           $product_name;           // массив для секции ИТОГО      
+           $product_name,           // массив для секции ИТОГО  
+    
+           $in_basket_0,
+           $in_basket_1,
+           $in_basket_2;
     
            $information = array();  // массив для сбора $information (Уведомлений)
            $total = 0;    
            $flag = false;
 
-           
+    $count = 0;      
     foreach($basket as $names=> $params)
-        {      
+        {             
 
-        echo $names;
-        echo "<br>\n";
-//       print_r($params); 
-       static $count ;
           if($names == 'игрушка детская велосипед')          //если он заказал "игрушка детская велосипед" в количестве >=3 штук, 
                 {                                           //то на эту позицию ему автоматически дается скидка 30%
                 if($params['количество заказано']>=3)
@@ -76,20 +79,26 @@ function parse_basket ($basket)
             }
         else 
             {
-            $discount['skidka'] = 0;
+            $discount['skidka'] = '00';
             $discount['price'] = 0;
             $discount['price_total'] = 0;
             $information[] = 'К сожалению товара "' . $names  .  '" нет на складе.';
             }                               
-          
-        echo 'Цена за единицу товара: ' . $params['цена']. ' руб ' . "<br>" . 'Скидка: ' .$discount['skidka'] . 
-                ' | Цена со скидкой: '. $discount['price'] . ' | Количество заказано: ' . $params['количество заказано'] . 
-                ' | На складе: ' . $params['осталось на складе'] . ' | Стоимость: ' . $discount['price_total'] . ' руб.';
-        echo "<br>";
-        echo "<hr>";
+                
+        
+        switch($count)  //создание массивов с данными по каждому товару
+        {
+            case 0 : $in_basket_0 = array($names, $params['цена'], $discount['skidka'], 
+                $discount['price'], $params['количество заказано'], $params['осталось на складе'], $discount['price_total']);Break;
+            case 1 : $in_basket_1 = array($names, $params['цена'], $discount['skidka'], 
+                $discount['price'], $params['количество заказано'], $params['осталось на складе'], $discount['price_total']);Break;
+            case 2 : $in_basket_2 = array($names, $params['цена'], $discount['skidka'],
+                $discount['price'], $params['количество заказано'], $params['осталось на складе'], $discount['price_total']);Break; $count = 0;
+        }
+        $count++;
         
         $total += $discount['price_total'];
-      
+        
     }
 }
 
@@ -105,6 +114,47 @@ function discount($price, $amount, $diskont)
 }
 
 parse_basket($bd);
+
+
+$combined_in_basket = array();
+$title = array('','Цена за единицу товара(руб):', 'Скидка: ', 'Цена со скидкой(руб): ', // массив с загловками для каждого
+    'Количество заказано(шт): ', 'На складе(шт): ', 'Стоимость(руб): ' );               // ряда таблицы
+
+function combined_in_basket($title,$in_basket_0, $in_basket_1, $in_basket_2)         // объединение массивов в один
+                {
+                    for ($i = 0; $i<count($in_basket_0); $i++)                    
+                        {
+                            $combined_in_basket[] = $title[$i];
+                            $combined_in_basket[] = $in_basket_0[$i];
+                            $combined_in_basket[] = $in_basket_1[$i];
+                            $combined_in_basket[] = $in_basket_2[$i];
+                        }
+                        return $combined_in_basket;
+                };
+$combined_in_basket = combined_in_basket($title,$in_basket_0, $in_basket_1, $in_basket_2);
+//var_dump($combined_in_basket);
+
+echo "<br>";
+
+$count = 0;
+
+echo "<table border=1>";                                            
+    
+    for($i=0; $i < (count($combined_in_basket)/4); $i++ )           // вывод корзины ($combined_in_basket) в виде таблицы
+        {
+            echo "<tr>"; 
+            
+                for ($j=0; $j<4; $j++ )
+                    {
+                        
+                        echo "<td text align = center>". $combined_in_basket[$count] . "</td>";
+                        $count++;
+                    }
+            
+            echo "</tr>"; 
+        }
+
+echo "</table>";
 
 foreach($product_name as $value)  // Цикл для подсчета общего количества товара
     {
@@ -136,3 +186,7 @@ if ($flag)
     {
         echo "<h3> Скидки: </h3>" . 'При заказе "игрушка детская велосипед" от 3 штук на эту позицию дается скидка 30%</p>';
     }
+    
+echo "<br>";
+
+
