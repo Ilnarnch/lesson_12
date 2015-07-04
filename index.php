@@ -30,7 +30,6 @@ diskont = diskont'.  mt_rand(0, 2).';
 $bd=  parse_ini_string($ini_string, true);
 //print_r($bd);
 
-$total_order = 0;           // Переменная для подсчета общего количества товара
 
 echo "<br>";
 
@@ -39,20 +38,24 @@ function parse_basket ($basket)
 {
     
     
-    global $information,          
-           $total,                  // Переменная для подсчета ИТОГО
-           $flag,
-           $product_name,           // массив для секции ИТОГО  
+    global  $flag;
     
-           $in_basket_0,
-           $in_basket_1,
-           $in_basket_2;
-    
-           $information = array();  // массив для сбора $information (Уведомлений)
-           $total = 0;    
+           $information = '';                    // переменная для Уведомлений          
+           $total = '';                         // переменная для подсчета Стоимость
+           $combined_in_basket_f = array();    // массив с данными, который выводится в виде таблицы
+           $information = array();            // массив для сбора $information (Уведомлений) 
+           $shipped = array();               // сколько отгружено(отправлено клиенту)
+           
            $flag = false;
+           
 
-    $count = 0;      
+    
+    $title = array('','Цена за единицу товара(руб)', 'Скидка', 'Цена со скидкой(руб)', // массив с загловками для каждой
+        'Количество заказано(шт)', 'На складе(шт)', 'Стоимость(руб)' );               // колонки таблицы
+    $combined_in_basket_f = array(0 => $title);  
+    
+    $count = 1;     // ключ массива $combined_in_basket_f
+    
     foreach($basket as $names=> $params)
         {             
 
@@ -69,13 +72,13 @@ function parse_basket ($basket)
             {                                                            
             $discount = discount($params['цена'], $params['количество заказано'], $params['diskont']);
             $params['осталось на складе'] = $params['количество заказано']; 
-            $product_name[$names] = $params['количество заказано'];
+            $shipped[$names] = $params['количество заказано'];
             }
         elseif ($params['осталось на складе']>0)                                                                                      
             {                                                            
             $discount = discount($params['цена'], $params['осталось на складе'], $params['diskont']);
             $information[] = 'Вы можете заказать "' . $names .'" - ' . $params['осталось на складе'] . ' шт.';
-            $product_name[$names] = $params['осталось на складе'];
+            $shipped[$names] = $params['осталось на складе'];
             }
         else 
             {
@@ -85,21 +88,24 @@ function parse_basket ($basket)
             $information[] = 'К сожалению товара "' . $names  .  '" нет на складе.';
             }                               
                 
-        
-        switch($count)  //создание массивов с данными по каждому товару
-        {
-            case 0 : $in_basket_0 = array($names, $params['цена'], $discount['skidka'], 
-                $discount['price'], $params['количество заказано'], $params['осталось на складе'], $discount['price_total']);Break;
-            case 1 : $in_basket_1 = array($names, $params['цена'], $discount['skidka'], 
-                $discount['price'], $params['количество заказано'], $params['осталось на складе'], $discount['price_total']);Break;
-            case 2 : $in_basket_2 = array($names, $params['цена'], $discount['skidka'],
-                $discount['price'], $params['количество заказано'], $params['осталось на складе'], $discount['price_total']);Break; $count = 0;
-        }
+
+
+$combined_in_basket_f[$count] = array($names, $params['цена'], $discount['skidka'], 
+                $discount['price'], $params['количество заказано'], $params['осталось на складе'], $discount['price_total']);
         $count++;
         
         $total += $discount['price_total'];
         
     }
+    
+    $parse_basket_f = array();  // массив который возвращает функция parse_basket();
+    
+    $parse_basket_f['shipped'] = $shipped;  
+    $parse_basket_f['total'] = $total;
+    $parse_basket_f['information'] = $information;
+    $parse_basket_f['combined_in_basket_f'] = $combined_in_basket_f;
+     
+        return $parse_basket_f;
 }
 
 
@@ -113,42 +119,25 @@ function discount($price, $amount, $diskont)
                 'price_total' => $total_price_all_items_with_diskont);
 }
 
-parse_basket($bd);
 
+$parse_basket = parse_basket($bd);
 
-$combined_in_basket = array();
-$title = array('','Цена за единицу товара(руб):', 'Скидка: ', 'Цена со скидкой(руб): ', // массив с загловками для каждого
-    'Количество заказано(шт): ', 'На складе(шт): ', 'Стоимость(руб): ' );               // ряда таблицы
-
-function combined_in_basket($title,$in_basket_0, $in_basket_1, $in_basket_2)         // объединение массивов в один
-                {
-                    for ($i = 0; $i<count($in_basket_0); $i++)                    
-                        {
-                            $combined_in_basket[] = $title[$i];
-                            $combined_in_basket[] = $in_basket_0[$i];
-                            $combined_in_basket[] = $in_basket_1[$i];
-                            $combined_in_basket[] = $in_basket_2[$i];
-                        }
-                        return $combined_in_basket;
-                };
-$combined_in_basket = combined_in_basket($title,$in_basket_0, $in_basket_1, $in_basket_2);
-//var_dump($combined_in_basket);
 
 echo "<br>";
 
-$count = 0;
+$combined_in_basket = $parse_basket['combined_in_basket_f'];
 
 echo "<table border=1>";                                            
     
-    for($i=0; $i < (count($combined_in_basket)/4); $i++ )           // вывод корзины ($combined_in_basket) в виде таблицы
+    for($i=0; $i < (count($combined_in_basket)); $i++ )           // вывод переменной $combined_in_basket в виде таблицы
         {
             echo "<tr>"; 
-            
-                for ($j=0; $j<4; $j++ )
+                $combined_in_basket_i = $combined_in_basket[$i];
+                for ($j=0; $j < count($combined_in_basket_i); $j++ )
                     {
                         
-                        echo "<td text align = center>". $combined_in_basket[$count] . "</td>";
-                        $count++;
+                        echo "<td text align = center>". $combined_in_basket_i[$j] . "</td>";
+                       
                     }
             
             echo "</tr>"; 
@@ -156,18 +145,19 @@ echo "<table border=1>";
 
 echo "</table>";
 
-foreach($product_name as $value)  // Цикл для подсчета общего количества товара
+$total_order = 0;           // Переменная для подсчета общего количества товара
+foreach($parse_basket['shipped'] as $value)  // Цикл для подсчета общего количества товара
     {
         $total_order += $value;
     }
 
 echo "<h4> ИТОГО:</h4>";
-    foreach($product_name as $key => $val)
+    foreach($parse_basket['shipped'] as $key => $val)
             {
                 echo 'Товара "' . $key . '" заказно - ' . $val . ' шт.' . "<br>";
             } 
             
- echo "<b>Общая сумма заказа:</b> $total руб." . "<br>" . 
+ echo '<b>Общая сумма заказа:</b> ' . $parse_basket['total'] . ' руб.' . "<br>" . 
                 
         "<b>Общее количество товара:</b>  $total_order " .' шт.' . "<br>" ;
         
@@ -175,7 +165,7 @@ echo "<h4> ИТОГО:</h4>";
 
 echo "<h3> Уведомления: </h3>"; 
 
-foreach ($information as $value){
+foreach ($parse_basket['information'] as $value){
     if($value <> '') 
         {
         echo $value . "<br>";
