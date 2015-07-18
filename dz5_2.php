@@ -35,40 +35,46 @@ $news=  explode("\n", $news);
 
 <?php 
 
-//    print_r($_POST); 
-    
-    echo "<br>";
+// print_r($_POST);
+   
+function display_all($news)   // функция вывода всего списка
+    {  
+        foreach ($news as $value) 
+            {
+                echo $value . "<br>";
+            }
+    }
+
+function display_the_one_news($id, $news)   // функция вывода конкретной новости
+        {     
+            if ($id <= count($news))   //(1/3) Если новость присутствует
+                {                
+                    foreach ($news as $key => $value) 
+                        {
+                            if ($id == $key) 
+                                {
+                                    echo $value . "<br>";  //(2/3) - вывести ее на сайте
+                                }
+                        }
+                } 
+            else 
+                {
+                    display_all($news);            //(3/3) иначе мы выводим весь список
+                }
+        }
 
 if (isset($_POST['submit']))     //если нажимали кнопку submit
     {
-        if ($_POST['id'] == 0)  // если параметр не был передан - выводить 404 ошибку
-            {         
+        $id = $_POST['id'];
+        
+        if (is_numeric($id))  
+            { 
+                display_the_one_news($id, $news); 
+            }
+        else                          // если параметр не был передан - выводить 404 ошибку
+            {                           
                 header("HTTP/1.0 404 Not Found");  
                 echo "Страница не найдена";
             }
- 
-        else
-            {                           
-                $id = $_POST['id'];
-            //    var_dump($_GET);
-                function display_the_one_news ($id, $news)     // функция вывода конкретной новости
-                    {   
-                        if ($id <= count($news))                //(1/3) Если новость присутствует
-                            {              
-                                foreach ($news as $key => $value)
-                                    {
-                                        if ($id == $key) {echo $value . "<br>";}   //(2/3) - вывести ее на сайте
-                                    }
-                            }
-                        else 
-                            {
-                                foreach($news as $value)
-                                    {
-                                        echo $value . "<br>";  //(3/3) иначе мы выводим весь список
-                                    }
-                            }
-                    }  
-    
-            display_the_one_news($id, $news); 
-            }
     }
+    
