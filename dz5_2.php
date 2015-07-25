@@ -13,6 +13,7 @@ $news='Четыре новосибирские компании вошли в с
 «Красный факел» пустит публику на ночные экскурсии за кулисы и по закоулкам столетнего здания
 Звезды телешоу «Голос» Наргиз Закирова и Гела Гуралиа споют в «Маяковском»';
 $news=  explode("\n", $news);
+
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -47,34 +48,33 @@ function display_all($news)   // функция вывода всего спис
 
 function display_the_one_news($id, $news)   // функция вывода конкретной новости
         {     
-            if ($id <= count($news))   //(1/3) Если новость присутствует
+            if ($id <= (count($news)-1))   //(1/3) Если новость присутствует
                 {                
-                    foreach ($news as $key => $value) 
-                        {
-                            if ($id == $key) 
-                                {
-                                    echo $value . "<br>";  //(2/3) - вывести ее на сайте
-                                }
-                        }
+                    echo $news[$id] . "<br>";  //(2/3) - вывести ее на сайте    
                 } 
             else 
                 {
                     display_all($news);            //(3/3) иначе мы выводим весь список
                 }
         }
-
-if (isset($_POST['submit']))     //если нажимали кнопку submit
-    {
-        $id = $_POST['id'];
         
-        if (is_numeric($id))  
-            { 
-                display_the_one_news($id, $news); 
-            }
-        else                          // если параметр не был передан - выводить 404 ошибку
-            {                           
-                header("HTTP/1.0 404 Not Found");  
-                echo "Страница не найдена";
+if(!empty($news)){
+        if (isset($_POST['submit']))     //если нажимали кнопку submit
+            {
+                $id = $_POST['id'];
+        
+                if (is_numeric($id))  
+                    { 
+                        display_the_one_news($id, $news); 
+                    }
+                else                          // если параметр не был передан - выводить 404 ошибку
+                    {                           
+                        header("HTTP/1.0 404 Not Found");  
+                        echo "Страница не найдена";
+                    }
             }
     }
-    
+ else 
+     {
+        echo 'Список новостей пуст';
+     }

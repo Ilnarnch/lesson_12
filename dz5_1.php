@@ -17,6 +17,7 @@ $news = 'Четыре новосибирские компании вошли в 
 Звезды телешоу «Голос» Наргиз Закирова и Гела Гуралиа споют в «Маяковском»';
 $news = explode("\n", $news);
 
+
 //print_r($news);
 
 function display_all($news)  // функция вывода всего списка новостей
@@ -29,7 +30,7 @@ function display_all($news)  // функция вывода всего спис�
 
 function display_the_one_news($id, $news) // функция вывода конкретной новости
         {     
-            if ($id <= count($news))     //(1/3) Если новость присутствует
+            if ($id <= (count($news)-1))     //(1/3) Если новость присутствует
                 {              
                     foreach ($news as $key => $value) 
                         {
@@ -44,22 +45,29 @@ function display_the_one_news($id, $news) // функция вывода кон�
                     display_all($news);      
                 }
         }
-
-if (count($_GET) == 0) 
+        
+if (!empty($news))
     {
-        display_all($news);
-    } 
-    
-else
-    {
-        if (key($_GET) == 'id' && is_numeric($_GET['id']))  
+        if (count($_GET) == 0) 
             {
-                $id = $_GET['id'];        
-                display_the_one_news($id, $news);
+                display_all($news);
             } 
-        else 
+    
+        else
             {
-                header("HTTP/1.0 404 Not Found");
-                echo "Страница не найдена";
+                if (key($_GET) == 'id' && is_numeric($_GET['id']))  
+                    {
+                        $id = $_GET['id'];        
+                        display_the_one_news($id, $news);
+                    } 
+                else 
+                    {
+                        header("HTTP/1.0 404 Not Found");
+                        echo "Страница не найдена";
+                    }
             }
+     }
+else 
+    {
+        echo 'Список новостей пуст';
     }
