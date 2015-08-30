@@ -196,7 +196,7 @@ if (!empty($_SESSION))
                             {
                                 if ($key == 'seller_name') {echo $value . ' | ';}
                             }
-                        echo "<a href = " . "http://xaver.loc/index.php/?id=$date>удалить</a>" . "<br>"; // При нажатии на «Удалить», объявление удаляется из сессии
+                        echo "<a href = " . "http://xaver.loc/" . $_SERVER['PHP_SELF']. "/?id=$date>удалить</a>" . "<br>"; // При нажатии на «Удалить», объявление удаляется из сессии
                     }
                     }
         }              
@@ -206,8 +206,6 @@ if (!empty($_SESSION))
      
     echo "<br>";
     
-
- 
 //       print_r($_SESSION);
     
 //unset($_SESSION['ad']);                    
