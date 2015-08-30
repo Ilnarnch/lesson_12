@@ -158,7 +158,7 @@ $metro = array('2028'=>'Берёзовая роща', '2018'=>'Гагаринс�
 
 if (!empty($_POST)) //	Всё что пришло из формы записать в $_SESSION 
     { 
-        $_SESSION['ad'][time()] = array // вывод всех объявлений, содержащихся в сессии 
+        $_SESSION['ad'][uniqid(rand())] = array // вывод всех объявлений, содержащихся в сессии 
             (
                 'private' => $_POST['private'], 'seller_name' => $_POST['seller_name'], 'email' => $_POST['email'],
                 'phone'=> $_POST['phone'], 'location_id'=> $_POST['location_id'], 
