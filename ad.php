@@ -68,5 +68,5 @@ $session = $_SESSION['ad'][$_GET['id']];
 <p><b>Описание объявления: </b><?php echo $session['description']; ?></p>
 <p><b>Цена: </b><?php echo $session['price']; ?></p>
 
-<a href="http://xaver.loc/index.php">Назад</a>
+<a href="../index.php">Назад</a>
 
