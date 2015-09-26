@@ -1,4 +1,5 @@
 <?php
+
     error_reporting(E_ERROR|E_WARNING|E_PARSE|E_NOTICE);
     ini_set('display_errors',1);
     header('Content-type: text/html; charset=utf-8');
@@ -32,267 +33,226 @@
         'Животные' => array('89' => 'Собаки', '90' => 'Кошки', '91' => 'Птицы', '92' => 'Аквариум', '93' => 'Другие животные',
             '94' => 'Товары для животных'),
         'Для бизнеса' => array('116' => 'Готовый бизнес', '40' => 'Оборудование для бизнеса'));
+    $formParams = array 
+        (
+            'head' => 'Страница добавления объявления',
+            'private' => '1',
+            'seller_name' => '',
+            'email' => '',
+            'phone' => '',
+            'location_id' => '',
+            'metro_id' => '',
+            'category_id' => '',
+            'title' => '',
+            'description' => '',
+            'price' => '0',
+            'button' => 'Далее'
+            
+        );
     
-    function form_d($cities, $metro, $categories){
-    echo '<form  method="post" action = "' .$_SERVER['PHP_SELF']. '" name = "form_1 " >';
-    
-    
-        echo '<div class="form-row-indented"> <label class="form-label-radio"><input type="radio" checked="" value="1" name="private">Частное лицо</label> <label class="form-label-radio"><input type="radio" value="0" name="private">Компания</label> </div>';
-       
-        echo '<div class="form-row"> <label for="fld_seller_name" class="form-label"><b id="your-name">Ваше имя</b></label>
-                <input type="text" maxlength="40" class="form-input-text" value="" name="seller_name" id="fld_seller_name">
-            </div>';
-     
-        echo '<div class="form-row"> <label for="fld_email" class="form-label">Электронная почта</label>
-                <input type="text" class="form-input-text" value="" name="email" id="fld_email">
-            </div>';
-    
-    
-        echo '<div class="form-row"> <label id="fld_phone_label" for="fld_phone" class="form-label">Номер телефона</label> <input type="text" class="form-input-text" value="" name="phone" id="fld_phone">
-            </div>';
-    
-        echo '<div id="f_location_id" class="form-row form-row-required"> <label for="region" class="form-label">Город</label> 
-                <select title="Выберите Ваш город" name="location_id" id="region" class="form-input-select">
-                    <option value="">-- Выберите город --</option>
-                    <option class="opt-group" disabled="disabled">-- Города --</option>';
-                
-                    foreach($cities as $number => $city)
-                    {
-                        echo '<option data-coords= ",," value="'. $number . '">'. $city . '</option>';
-                    }
-                
-        echo '</select> 
-     
-            <div id="f_metro_id"> 
-                <select title="Выберите станцию метро" name="metro_id" id="fld_metro_id" class="form-input-select"> 
-                    <option value="">-- Выберите станцию метро --</option>';
-                
-                    
-                        foreach($metro as $number => $station) 
+function displayForm($cities, $metro, $categories, $formParams,$id=''){ 
+    echo
+        '<form  method="post" action = "'. $_SERVER['PHP_SELF']. '" name = "form_1">';
+    echo
+            '<h2>'. $formParams['head']. '</h2>';
+    echo
+            '<div class="form-row-indented"> 
+                <label class="form-label-radio"><input type="radio"';
+                    if ($formParams['private'] == 1)
+                        { 
+                            echo 'checked=""';
+                        } 
+    echo                 
+                        'value="1" name="private">Частное лицо</label>';
+    echo
+                '<label class="form-label-radio">
+                    <input type="radio"'; 
+                        if ($formParams['private'] == 0)
                             {
-                                echo '<option value="' . $number. '" >' . $station . '</option>';
-                            }
-                   
-                
-                echo '</select> 
-            </div> 
-     </div>';
-           
-        echo '<div class="form-row"> <label for="fld_category_id" class="form-label">Категория</label> 
-                <select title="Выберите категорию объявления" name="category_id" id="fld_category_id" class="form-input-select"> 
-                    <option value="">-- Выберите категорию --</option>';
-                           
-                    foreach($categories as $section => $category)
-                        {
-                            echo '<optgroup label = "' . $section .' ">';
-                            foreach($category as $number => $value)
-                                {
-                                    echo '<option value="'.$number.'">'. $value . '</option>';
-                                }
-                            echo '</optgroup>';
-                        }
-                
-            echo '</select> 
+                                echo 'checked=""';
+                            }  
+    echo                   
+                        'value="0" name="private">Компания</label> 
+            </div>';
+    echo
+        '<div class="form-row"> <label for="fld_seller_name" class="form-label"><b id="your-name">Ваше имя</b></label>
+            <input type="text" maxlength="40" class="form-input-text" value="'. $formParams['seller_name'] .'" name="seller_name" id="fld_seller_name">
         </div>';
-    
-       echo '<div id="f_title" class="form-row f_title"> <label for="fld_title" class="form-label">Название объявления</label> <input type="text" maxlength="50" class="form-input-text-long" value="" name="title" id="fld_title"> </div>
-    
-        <div class="form-row"> <label for="fld_description" class="form-label" id="js-description-label">Описание объявления</label> <textarea maxlength="3000" name="description" id="fld_description" class="form-input-textarea"></textarea> </div>
-    
-        <div id="price_rw" class="form-row rl"> <label id="price_lbl" for="fld_price" class="form-label">Цена</label> <input type="text" maxlength="9" class="form-input-text-short" value="0" name="price" id="fld_price">&nbsp;<span id="fld_price_title">руб.</div>
-
-        <div class="form-row-indented form-row-submit b-vas-submit" id="js_additem_form_submit">
-            <div class="vas-submit-button pull-left"> <span class="vas-submit-border"></span> <span class="vas-submit-triangle"></span> <input type="submit" value="Далее" id="form_submit" name="main_form_submit" class="vas-submit-input"> </div>
-        </div>
-    </form>';
-}
-function form_c($id, $for_form, $cities, $metro, $categories){
-    echo '<form  method="post" action = "index.php" name = "form_2 " >';
-      
-    echo 
-        '<div class="form-row-indented"> 
-            <label class="form-label-radio">
-            <input type="radio"';
-                if ($for_form['private']==1){echo 'checked = ""';}
-    echo    'value="1" name="private">Частное лицо</label> 
-            <label class="form-label-radio">
-            <input type="radio"';  
-                if ($for_form['private']==0){echo 'checked = ""';} 
-    echo 'value="0" name="private">Компания</label> 
-        </div>';
-    echo 
-        '<div class="form-row"> 
-            <label for="fld_seller_name" class="form-label"><b id="your-name">Ваше имя</b></label>
-            <input type="text" maxlength="40" class="form-input-text" value="'. $for_form['seller_name'] .'" name="seller_name" id="fld_seller_name">
-        </div>';
-    
     echo
         '<div class="form-row"> <label for="fld_email" class="form-label">Электронная почта</label>
-            <input type="text" class="form-input-text" value="'. $for_form['email'] .'" name="email" id="fld_email">
+            <input type="text" class="form-input-text" value="'. $formParams['email'] .'" name="email" id="fld_email">
+        </div>';
+
+    echo
+        '<div class="form-row"> <label id="fld_phone_label" for="fld_phone" class="form-label">Номер телефона</label> 
+            <input type="text" class="form-input-text" value="'. $formParams['phone'] .'" name="phone" id="fld_phone">
         </div>';
     
-    echo
-        '<div class="form-row"> 
-            <label id="fld_phone_label" for="fld_phone" class="form-label">Номер телефона</label> 
-            <input type="text" class="form-input-text" value="'. $for_form['phone'] .'" name="phone" id="fld_phone">
-        </div>';
-    
-    echo
+     echo
         '<div id="f_location_id" class="form-row form-row-required"> <label for="region" class="form-label">Город</label> 
             <select title="Выберите Ваш город" name="location_id" id="region" class="form-input-select">
                 <option value="">-- Выберите город --</option>
                 <option class="opt-group" disabled="disabled">-- Города --</option>';
-                
-                    foreach($cities as $number => $city)
+            
+                foreach ($cities as $number => $city)
                     {
-                        echo '<option data-coords= ",," value="'. $number . '"';
-                            if($number==$for_form['location_id']){echo'selected';} 
-                                echo '>'. $city . '</option>';
+                        echo '<option data-coords= ",," value="' . $number . '"';
+                            if ($city == $formParams['location_id'])
+                                {
+                                    echo 'selected';
+                                }
+                        echo '>' . $city . '</option>';
+                    }
+    echo        
+        '</select>'; 
+    echo 
+        '<div id="f_metro_id"> 
+            <select title="Выберите станцию метро" name="metro_id" id="fld_metro_id" class="form-input-select"> 
+                <option value="">-- Выберите станцию метро --</option>';
+
+                foreach ($metro as $number => $station)
+                    {
+                        echo '<option value="' . $number . '"';
+                            if ($station == $formParams['metro_id'])
+                                {
+                                    echo 'selected';
+                                }
+                    echo '>' . $station . '</option>';
                     }
                 
-    echo    '</select>'; 
-     
-    echo
-            '<div id="f_metro_id"> 
-                <select title="Выберите станцию метро" name="metro_id" id="fld_metro_id" class="form-input-select"> 
-                    <option value="">-- Выберите станцию метро --</option>';                
-                    
-                        foreach($metro as $number => $station) 
-                            {
-                                echo '<option value="' . $number. '"'; 
-                                    if($number==$for_form['metro_id']){ echo 'selected';}
-                                    echo '>' . $station . '</option>';
-                            }
-    echo                              
-                '</select> 
-            </div> 
-      </div>';
-          
-    echo
-        '<div class="form-row"> <label for="fld_category_id" class="form-label">Категория</label> 
-            <select title="Выберите категорию объявления" name="category_id" id="fld_category_id" class="form-input-select"> 
-                <option value="">-- Выберите категорию --</option>';
-                           
-                    foreach($categories as $section => $category)
-                        {
-                            echo '<optgroup label = "' . $section .' ">';
-                            foreach($category as $number => $value)
-                                {
-                                    echo '<option value="'.$number.'"';
-                                    if($number == $for_form['category_id']){echo 'selected';}
-                                    echo '>'. $value . '</option>';
-                                }
-                            echo '</optgroup>';
-                        }
-    echo
+echo
             '</select> 
-        </div>';
-   
-    echo
-        '<div id="f_title" class="form-row f_title"> 
-            <label for="fld_title" class="form-label">Название объявления</label> 
-            <input type="text" maxlength="50" class="form-input-text-long" value="'. $for_form['title'] .'" name="title" id="fld_title"> 
-        </div>';
-   
-    echo
-        '<div class="form-row"> 
-            <label for="fld_description" class="form-label" id="js-description-label">Описание объявления</label> 
-                <textarea maxlength="3000" name="description" id="fld_description" class="form-input-textarea">'. $for_form['description'].'</textarea> 
-        </div>';
-    
-    echo
-        '<div id="price_rw" class="form-row rl"> 
-            <label id="price_lbl" for="fld_price" class="form-label">Цена</label> 
-            <input type="text" maxlength="9" class="form-input-text-short" value="'. $for_form['price'] .'" name="price" id="fld_price">&nbsp;<span id="fld_price_title">руб.
-        </div>';
-     
-    echo
-        '<div class="form-row-indented form-row-submit b-vas-submit" id="js_additem_form_submit">
-            <div class="vas-submit-button pull-left"> <span class="vas-submit-border"></span> 
-                <span class="vas-submit-triangle"></span> 
-                <input type="submit" value="Готово" id="form_submit" name="main_form_submit" class="vas-submit-input"> 
-            </div>
-        </div>';
-    echo
-        ' <input type ="hidden" value="'. $id .'" name="hidden">
-    </form>';
-}
-   function display($ads) {
-               foreach ($ads as $id => $idData)
+        </div> 
+    </div>';
+echo
+    '<div class="form-row"> <label for="fld_category_id" class="form-label">Категория</label> 
+        <select title="Выберите категорию объявления" name="category_id" id="fld_category_id" class="form-input-select"> 
+            <option value="">-- Выберите категорию --</option>';
+                
+                foreach ($categories as $section => $category)
                     {
-                        echo '<tr>
+                        echo '<optgroup label = "'. $section .'">';
+                    
+                            foreach ($category as $number => $value)
+                                {
+                                    echo '<option value="' . $number . '"';
+                                    if ($number == $formParams['category_id'])
+                                        {
+                                            echo 'selected';
+                                        }
+                                    echo '>' . $value . '</option>';
+                                }
+echo                   
+                             '</optgroup>';
+   
+                    }
+echo
+        '</select> 
+    </div>';
+
+echo
+
+    '<div id="f_title" class="form-row f_title"> 
+        <label for="fld_title" class="form-label">Название объявления</label> 
+        <input type="text" maxlength="50" class="form-input-text-long" value="'. $formParams['title'].'" name="title" id="fld_title"> 
+    </div>';
+echo
+    '<div class="form-row"> 
+        <label for="fld_description" class="form-label" id="js-description-label">Описание объявления</label> 
+        <textarea maxlength="3000" name="description" id="fld_description" class="form-input-textarea">'. $formParams['description'] .'</textarea> 
+    </div>';
+echo
+    '<div id="price_rw" class="form-row rl"> 
+        <label id="price_lbl" for="fld_price" class="form-label">Цена</label> 
+        <input type="text" maxlength="9" class="form-input-text-short" value="'. $formParams['price'] .'" name="price" id="fld_price">&nbsp;<span id="fld_price_title">руб.
+    </div>';
+echo
+    '<div class="form-row-indented form-row-submit b-vas-submit" id="js_additem_form_submit">
+        <div class="vas-submit-button pull-left"> <span class="vas-submit-border"></span> <span class="vas-submit-triangle"></span> <input type="submit" value="'. $formParams['button'] .'" id="form_submit" name="main_form_submit" class="vas-submit-input"> </div>
+    </div>
+    <input type="hidden" name="hidden" value="'.$id.'">
+</form>';
+    if ($id <> '')
+        {
+            echo '<a href="index.php">Назад</a>';
+        }
+}
+   function display($ads) 
+            {
+                echo '<table>';
+                    foreach ($ads as $id => $idData)
+                        {
+                            echo '<tr>
                                 <td> <a href = "index.php?id='. $id. '">'. $idData['title'] . '</a>' .' | '. '</td>'. //	При нажатии на «название объявления» на экран выводится шаблон объявления 
                                 '<td>' . $idData['price'] .' руб.'. ' | '. '</td>' .
                                 '<td>' . $idData['seller_name'] . ' | '. '</td>'.
                                 '<td><a href = "index.php?del='.$id . '">удалить</a>' . "<br>". '</td>'. // При нажатии на «Удалить», объявление удаляется из сессии
                              '</tr>'; 
-                    }
+                        }
+                echo '</table>';
             }
 ?>
 <?php
-    if ((isset($_GET['id'])) && (!isset($_POST['hidden']))) 
+    if (isset($_GET['id']))
         {
-       
         $for_form = $_SESSION['ad'][$_GET['id']];
+        $id = $_GET['id'];
+        $formParams = array 
+        (
+            'head' => 'Страница редактирования',
+            'private' => $for_form['private'],
+            'seller_name' => $for_form['seller_name'],
+            'email' => $for_form['email'],
+            'phone' => $for_form['phone'],
+            'location_id' => $for_form['location_id'],
+            'metro_id' => $for_form['metro_id'],
+            'category_id' => $for_form['category_id'],
+            'title' => $for_form['title'],
+            'description' => $for_form['description'],
+            'price' => $for_form['price'],
+            'button' => 'Готово'
+            
+        );               
         unset($_POST);
-                 
-?>
-    <h2>Страница редактирования</h2>
-    <hr>
-<?php
-form_c($_GET['id'],$for_form, $cities, $metro, $categories);
-
-?>
-<a href="index.php">Назад</a>
-
-<?php
-    unset($_GET['id']);
+        unset($_GET['id']);
         }
-        else 
-            {
-                if (isset($_POST['hidden']) && isset($_POST['main_form_submit'])) // если id редактироемого объявления был создан(при нажатии на "Названии объявления")
-                    {                                                                 // и была нажато кнопка "Готово"
-                        $new = $_POST['hidden'];
-                        unset($_SESSION['ad'][$new]); 
-                        unset($_POST['hidden']);
-                    }
+    else 
+        {
+            $id = '';
+            if (isset($_POST['hidden']) && isset($_POST['main_form_submit'])) // если id редактироемого объявления был создан(при нажатии на "Названии объявления")
+                {   if ($_POST['hidden'] <> '')
+                        {                                                              // и была нажато кнопка "Готово"
+                            $new = $_POST['hidden'];
+                            unset($_SESSION['ad'][$new]); 
+                            unset($_POST['hidden']);
+                        }
+                }
               
-                $_SESSION['flag'] = 1;
-                if (isset($_GET['del']))  //удаление объявления
-                    {
-                        unset($_SESSION['ad'][$_GET['del']]); 
-                    }
+            if (isset($_GET['del']))  //удаление объявления
+                {
+                    unset($_SESSION['ad'][$_GET['del']]); 
+                }
+    
+            if (!empty($_POST)) //	Всё, что пришло из формы записать в $_SESSION 
+                {            
+                    $_SESSION['ad'][] = array 
+                        (
+                            'private' => $_POST['private'], 'seller_name' => $_POST['seller_name'], 'email' => $_POST['email'],
+                            'phone'=> $_POST['phone'], 'location_id'=> $_POST['location_id'], 
+                            'metro_id' => $_POST['metro_id'], 'category_id'=> $_POST['category_id'], 
+                            'title'=> $_POST['title'], 'description'=> $_POST['description'], 'price'=> $_POST['price']
+                        );
+                    unset($_POST);
+                }
     
 
-form_d($cities, $metro, $categories);
-?>
-<?php
+       }
 
-if (!empty($_POST)) //	Всё, что пришло из формы записать в $_SESSION 
-    {            
-        $_SESSION['ad'][] = array 
-            (
-                'private' => $_POST['private'], 'seller_name' => $_POST['seller_name'], 'email' => $_POST['email'],
-                'phone'=> $_POST['phone'], 'location_id'=> $_POST['location_id'], 
-                'metro_id' => $_POST['metro_id'], 'category_id'=> $_POST['category_id'], 
-                'title'=> $_POST['title'], 'description'=> $_POST['description'], 'price'=> $_POST['price']
-            );
-        unset($_POST);
-    }
-    
-    echo "<br>";
+           
+    displayForm($cities, $metro, $categories, $formParams,$id);
 
-if (!empty($_SESSION['ad']))  // вывод всех объявлений, содержащихся в сессии 
-    {    
-        $ads = $_SESSION['ad'];
-        ?>
-    <table>
-        <?php
+    if (!empty($_SESSION['ad']) && $formParams['head'] == 'Страница добавления объявления')  // вывод всех объявлений, содержащихся в сессии 
+        {    
+            $ads = $_SESSION['ad'];
             display($ads);
-        ?>
-    </table> 
-<?php
-    }
-           }
-
-
+        }
