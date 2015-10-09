@@ -4,15 +4,13 @@
     ini_set('display_errors',1);
     header('Content-type: text/html; charset=utf-8');
 
-    session_start();
-
     $cities = array('641780'=>'Новосибирск','641490'=>'Барабинск','641510'=>'Бердск', // массив для вывода в цикле foreach 
         '641600'=>'Искитим', '641630'=>'Колывань', '641680'=>'Краснообск',  
         '641710'=>'Куйбышев','641760'=>'Мошково', '641790'=>'Обь', 
         '641800'=>'Ордынское', '641970'=>'Черепаново', '0'=>'Выбрать другой...',  ); 
 
-    $metro = array('2028'=>'Берёзовая роща', '2018'=>'Гагаринская', '2017'=>'Заельцовская', '2029'=>'Золотая Нива', '2019'=>'Красный проспект', '2027'=>'Маршала Покрышкина', 
-        '2021'=>'Октябрьская', '2025' => 'Площадь Гарина-Михайловского', '2020'=>'Площадь Ленина', '2024'=>'Площадь Маркса', '2022'=>'Речной вокзал', '2026'=>'Сибирская', '2023'=>'Студенческая' );
+//    $metro = array('2028'=>'Берёзовая роща', '2018'=>'Гагаринская', '2017'=>'Заельцовская', '2029'=>'Золотая Нива', '2019'=>'Красный проспект', '2027'=>'Маршала Покрышкина', 
+//        '2021'=>'Октябрьская', '2025' => 'Площадь Гарина-Михайловского', '2020'=>'Площадь Ленина', '2024'=>'Площадь Маркса', '2022'=>'Речной вокзал', '2026'=>'Сибирская', '2023'=>'Студенческая' );
 
     $categories = array //массив 'секция' => array ('код категории' => 'название категории')
         ('Транспорт' => array('9' => 'Автомобили с пробегом', '109'=> 'Новые автомобили', '14' => 'Мотоциклы и мототехника', '81' => 'Грузовики и спецтехника', '11' => 'Водный транспорт', '10' => 'Запчасти и аксессуары' ),
@@ -41,16 +39,16 @@
             'email' => '',
             'phone' => '',
             'location_id' => '',
-            'metro_id' => '',
+            'checkbox' => '',
             'category_id' => '',
             'title' => '',
             'description' => '',
-            'price' => '0',
+            'price' => '',
             'button' => 'Далее'
             
         );
     
-function displayForm($cities, $metro, $categories, $formParams,$id=''){ 
+function displayForm($cities, $categories, $formParams, $id=''){ 
     echo
         '<form  method="post" action = "'. $_SERVER['PHP_SELF']. '" name = "form_1">';
     echo
@@ -106,23 +104,14 @@ function displayForm($cities, $metro, $categories, $formParams,$id=''){
     echo        
         '</select>'; 
     echo 
-        '<div id="f_metro_id"> 
-            <select title="Выберите станцию метро" name="metro_id" id="fld_metro_id" class="form-input-select"> 
-                <option value="">-- Выберите станцию метро --</option>';
-
-                foreach ($metro as $number => $station)
-                    {
-                        echo '<option value="' . $number . '"';
-                            if ($station == $formParams['metro_id'])
-                                {
-                                    echo 'selected';
-                                }
-                    echo '>' . $station . '</option>';
-                    }
+        '<div id="f_checkbox"> 
+            <p> Получать рассылку? </p>
+            <p><input type = "checkbox" name="checkbox" value="Yes"'; if ($formParams['checkbox'] == 'Yes'){ echo 'checked';} echo '>Да</p>
+            <p><input type = "checkbox" name="checkbox" value="No"';if ($formParams['checkbox'] == 'No'){ echo 'checked';} echo '>Нет</p>';
+       
                 
 echo
-            '</select> 
-        </div> 
+           '</div> 
     </div>';
 echo
     '<div class="form-row"> <label for="fld_category_id" class="form-label">Категория</label> 
@@ -174,29 +163,30 @@ echo
 </form>';
     if ($id <> '')
         {
-            echo '<a href="index.php">Назад</a>';
+            echo '<a href="dz7_1.php">Назад</a>';
         }
 }
    function display($ads) 
             {
+            ksort($ads);
                 echo '<table>';
                     foreach ($ads as $id => $idData)
                         {
                             echo '<tr>
-                                <td> <a href = "index.php?id='. $id. '">'. $idData['title'] . '</a>' .' | '. '</td>'. //	При нажатии на «название объявления» на экран выводится шаблон объявления 
+                                <td> <a href = "dz7_1.php?id='. $id. '">'. $idData['title'] . '</a>' .' | '. '</td>'. //	При нажатии на «название объявления» на экран выводится шаблон объявления 
                                 '<td>' . $idData['price'] .' руб.'. ' | '. '</td>' .
                                 '<td>' . $idData['seller_name'] . ' | '. '</td>'.
-                                '<td><a href = "index.php?del='.$id . '">удалить</a>' . "<br>". '</td>'. // При нажатии на «Удалить», объявление удаляется из сессии
+                                '<td><a href = "dz7_1.php?del='.$id . '">удалить</a>' . "<br>". '</td>'. // При нажатии на «Удалить», объявление удаляется из куки
                              '</tr>'; 
                         }
                 echo '</table>';
             }
-?>
-<?php
+
+
     if (isset($_GET['id']))
         {
-        $for_form = $_SESSION['ad'][$_GET['id']];
         $id = $_GET['id'];
+        $for_form = unserialize($_COOKIE ['ad'])[$id];
         $formParams = array 
         (
             'head' => 'Страница редактирования',
@@ -205,54 +195,120 @@ echo
             'email' => $for_form['email'],
             'phone' => $for_form['phone'],
             'location_id' => $for_form['location_id'],
-            'metro_id' => $for_form['metro_id'],
+            'checkbox' => $for_form['checkbox'],
             'category_id' => $for_form['category_id'],
             'title' => $for_form['title'],
             'description' => $for_form['description'],
             'price' => $for_form['price'],
             'button' => 'Готово'
-            
-        );               
-        unset($_POST);
-        unset($_GET['id']);
+        );
+        
+        print_r($for_form);
+        
         }
     else 
-        {
-            $id = '';
-            if (isset($_POST['hidden']) && isset($_POST['main_form_submit'])) // если id редактироемого объявления был создан(при нажатии на "Названии объявления")
-                {   if ($_POST['hidden'] <> '')
-                        {                                                              // и была нажато кнопка "Готово"
-                            $new = $_POST['hidden'];
-                            unset($_SESSION['ad'][$new]); 
+        { 
+            if (isset($_POST['hidden']))
+                {
+                     $id = $_POST['hidden'];
+                }
+            else
+                {
+                     $id = '';
+                }
+           
+            if (isset($_POST['main_form_submit']) && !empty($_POST['hidden'])) // если id редактироемого объявления был создан(при нажатии на "Названии объявления")
+                {   
+                                                                                    // и была нажато кнопка "Готово" (удаление объявления которое было до редактирования)
+                            $id_f_d = $_POST['hidden'];
+                                                       
+                            $uns_f_cor = unserialize($_COOKIE['ad']);
+                            unset($uns_f_cor[$id_f_d]);
+                            $_COOKIE['ad'] = serialize($uns_f_cor);
+                            setcookie('ad', $_COOKIE['ad']);
+                            
                             unset($_POST['hidden']);
-                        }
+                        
                 }
               
             if (isset($_GET['del']))  //удаление объявления
                 {
-                    unset($_SESSION['ad'][$_GET['del']]); 
+                    $uns_f_d = unserialize($_COOKIE['ad']);
+                    unset($uns_f_d[$_GET['del']]);
+                    $_COOKIE['ad'] = serialize($uns_f_d);
+                    setcookie('ad', $_COOKIE['ad']);
                 }
     
-            if (!empty($_POST)) //	Всё, что пришло из формы записать в $_SESSION 
-                {            
-                    $_SESSION['ad'][] = array 
-                        (
-                            'private' => $_POST['private'], 'seller_name' => $_POST['seller_name'], 'email' => $_POST['email'],
-                            'phone'=> $_POST['phone'], 'location_id'=> $_POST['location_id'], 
-                            'metro_id' => $_POST['metro_id'], 'category_id'=> $_POST['category_id'], 
-                            'title'=> $_POST['title'], 'description'=> $_POST['description'], 'price'=> $_POST['price']
-                        );
+            if (!empty($_POST)) //	Всё, что пришло из формы записать в $_COOKIE 
+                {
+                    if(!isset($_COOKIE['ad']))
+                        {
+                            $for_cookie_array[] = array 
+                                (   
+                                    'private' => $_POST['private'], 'seller_name' => $_POST['seller_name'], 'email' => $_POST['email'],
+                                    'phone'=> $_POST['phone'], 'location_id'=> $_POST['location_id'], 
+                                    'checkbox' => $_POST['checkbox'], 'category_id'=> $_POST['category_id'], 
+                                    'title'=> $_POST['title'], 'description'=> $_POST['description'], 'price'=> $_POST['price']
+                                );
+                            setcookie('ad', serialize($for_cookie_array));
+                        }
+                    else
+                        {
+                              $uns = unserialize($_COOKIE['ad']);
+                              ($id);
+                              if ($id == '')
+                                  {
+                                        $uns[] = array 
+                                            (   
+                                                'private' => $_POST['private'], 'seller_name' => $_POST['seller_name'], 'email' => $_POST['email'],
+                                                'phone'=> $_POST['phone'], 'location_id'=> $_POST['location_id'], 
+                                                'checkbox' => $_POST['checkbox'], 'category_id'=> $_POST['category_id'], 
+                                                'title'=> $_POST['title'], 'description'=> $_POST['description'], 'price'=> $_POST['price']
+                                            );
+                                                                  
+                                  }
+                               else{
+                                    $uns[$id] = array 
+                                        (   
+                                            'private' => $_POST['private'], 'seller_name' => $_POST['seller_name'], 'email' => $_POST['email'], // создание отредактированного объявления
+                                            'phone'=> $_POST['phone'], 'location_id'=> $_POST['location_id'], 
+                                            'checkbox' => $_POST['checkbox'], 'category_id'=> $_POST['category_id'], 
+                                            'title'=> $_POST['title'], 'description'=> $_POST['description'], 'price'=> $_POST['price']
+                                        );
+                                    $id = '';
+                                  }
+                                $ser = serialize($uns);
+                                setcookie('ad', $ser);
+                        }
+                    echo "<br>";
                     unset($_POST);
                 }
-    
-
-       }
+           }
 
            
-    displayForm($cities, $metro, $categories, $formParams,$id);
-
-    if (!empty($_SESSION['ad']) && $formParams['head'] == 'Страница добавления объявления')  // вывод всех объявлений, содержащихся в сессии 
+    displayForm($cities, $categories, $formParams, $id);
+    
+    
+    
+    if (!empty($_COOKIE['ad']) && $formParams['head'] == 'Страница добавления объявления')  // вывод всех объявлений, содержащихся в куки 
         {    
-            $ads = $_SESSION['ad'];
+            $ads = unserialize($_COOKIE['ad']);
             display($ads);
         }
+       
+
+echo "<br>";
+echo "<br>";
+
+
+
+
+
+
+
+
+
+
+
+
+
