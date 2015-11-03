@@ -58,27 +58,15 @@
                 return $out;
         }
     
-    function uns ($uns,$id = '')
+    function uns ($uns, $POST, $id = '')
                                 {
                                   if ($id == '')
                                     {
-                                      $uns[] = array 
-                                            (   
-                                                'private' => $_POST['private'], 'seller_name' => $_POST['seller_name'], 'email' => $_POST['email'],
-                                                'phone'=> $_POST['phone'], 'location_id'=> $_POST['location_id'], 
-                                                'checkbox' => isset($_POST['checkbox'])?$_POST['checkbox']:'', 'category_id'=> $_POST['category_id'], 
-                                                'title'=> $_POST['title'], 'description'=> $_POST['description'], 'price'=> $_POST['price']
-                                            );
+                                      $uns[] = prepareAd($POST);
                                     }
                                   else
                                     {
-                                      $uns[$id] = array 
-                                        (   
-                                            'private' => $_POST['private'], 'seller_name' => $_POST['seller_name'], 'email' => $_POST['email'], // создание отредактированного объявления
-                                            'phone'=> $_POST['phone'], 'location_id'=> $_POST['location_id'], 
-                                            'checkbox' => isset($_POST['checkbox'])?$_POST['checkbox']:'', 'category_id'=> $_POST['category_id'], 
-                                            'title'=> $_POST['title'], 'description'=> $_POST['description'], 'price'=> $_POST['price']
-                                        );
+                                      $uns[$id] = prepareAd($POST);
                                     }
                                     return $uns;
                                 }
@@ -123,11 +111,14 @@
             if (isset($_POST['main_form_submit']))
                 {
                     $data = $_POST;
+                    
                     if(is_numeric($data['hidden']))  // пишем объявление в массив через айдишник
                         {
+                            
                             $id = $data['hidden'];
-                            $the_unserialized_array = uns($the_unserialized_array,$id);
+                            $the_unserialized_array = uns($the_unserialized_array, $_POST ,$id);
                             $ser = serialize($the_unserialized_array);
+                            unset($id);
                         }
                     else
                         {
@@ -136,7 +127,6 @@
                             $ser = serialize($the_unserialized_array);
                         }
                         setcookie('ad', $ser);
-                        unset($_POST);
                      
                 }
  
@@ -167,10 +157,3 @@
             $ads = $the_unserialized_array;
             display($ads);
         }
-       
-        
-    if(isset($the_unserialized_array))
-        {
-            unset($the_unserialized_array);
-        }    
-
