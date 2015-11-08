@@ -57,43 +57,12 @@
                 }
                 return $out;
         }
-    
-    function uns ($uns, $POST, $id = '')
-                                {
-                                  if ($id == '')
-                                    {
-                                      $uns[] = prepareAd($POST);
-                                    }
-                                  else
-                                    {
-                                      $uns[$id] = prepareAd($POST);
-                                    }
-                                    return $uns;
-                                }
-    
-
-
-   function display($ads) 
-            {
-            ksort($ads);
-                echo '<table>';
-                    foreach ($ads as $id => $idData)
-                        {
-                            echo '<tr>
-                                <td> <a href = "dz7_1.php?id='. $id. '">'. $idData['title'] . '</a>' .' | '. '</td>'. //	При нажатии на «название объявления» на экран выводится шаблон объявления 
-                                '<td>' . $idData['price'] .' руб.'. ' | '. '</td>' .
-                                '<td>' . $idData['seller_name'] . ' | '. '</td>'.
-                                '<td><a href = "dz7_1.php?del='.$id . '">удалить</a>' . "<br>". '</td>'. // При нажатии на «Удалить», объявление удаляется из куки
-                             '</tr>'; 
-                        }
-                echo '</table>';
-            }
 
             $formParams = prepareAd(null,'Страница добавления объявления','Далее');
             
             if(isset($_COOKIE['ad']))
                 {
-                    $the_unserialized_array = unserialize($_COOKIE['ad']); // десериализованный массив (куки)
+                    $adStore = unserialize($_COOKIE['ad']); // десериализованный массив (куки)
                 }
 
 
@@ -101,9 +70,9 @@
         {
             $id = $_GET['id'];
         
-            $for_form = $the_unserialized_array[$id];
+            $ad = $adStore[$id];
 
-            $formParams = prepareAd($for_form, 'Страница редактирования', 'Готово');
+            $formParams = prepareAd($ad, 'Страница редактирования', 'Готово');
         
         }
     else 
@@ -116,23 +85,21 @@
                         {
                             
                             $id = $data['hidden'];
-                            $the_unserialized_array = uns($the_unserialized_array, $_POST ,$id);
-                            $ser = serialize($the_unserialized_array);
+                            $adStore[$id] = prepareAd($_POST);
                             unset($id);
                         }
                     else
                         {
-                        
-                            $the_unserialized_array[] = prepareAd($_POST); // иначе добавляем в конец массива
-                            $ser = serialize($the_unserialized_array);
+                            $adStore[] = prepareAd($_POST); // иначе добавляем в конец массива
                         }
+                        $ser = serialize($adStore);
                         setcookie('ad', $ser);
                      
                 }
  
             if (isset($_GET['del']))  //удаление объявления
                 {
-                    $uns_for_del = $the_unserialized_array;
+                    $uns_for_del = $adStore;
                     
                     unset($uns_for_del[$_GET['del']]);
                     $_COOKIE['ad'] = serialize($uns_for_del);
@@ -144,16 +111,11 @@
     
            }
 
-    require_once ('form.php');
+        function display_new ($templateName, $formParams, $adStore, $id=null)
+            {
+                require_once ($templateName);
+            }
+            
 
-     if ($formParams['head'] == 'Страница редактирования')
-        {
-            echo '<a href="dz7_1.php">Назад</a>';
-        }
-        
-        
-    if (!empty($the_unserialized_array) && $formParams['head'] == 'Страница добавления объявления')  // вывод всех объявлений, содержащихся в куки 
-        {    
-            $ads = $the_unserialized_array;
-            display($ads);
-        }
+            
+            display_new('layout.php', $formParams, $adStore=(isset($adStore)?$adStore:''), $id=(isset($id))?$id:''); 
