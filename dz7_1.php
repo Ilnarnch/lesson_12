@@ -57,19 +57,20 @@
                 }
                 return $out;
         }
-
-            $formParams = prepareAd(null,'Страница добавления объявления','Далее');
-            
-            if(isset($_COOKIE['ad']))
+        
+           function display_new ($templateName, $formParams, $adStore, $id)
                 {
-                    $adStore = unserialize($_COOKIE['ad']); // десериализованный массив (куки)
+                    require_once ($templateName);
                 }
 
+            $formParams = prepareAd(null,'Страница добавления объявления','Далее');
+
+            $adStore = (isset($_COOKIE['ad']))?unserialize($_COOKIE['ad']):[];  // десериализованный массив (куки)
+                
+            $id = isset($_GET['id'])?$_GET['id']:'';  
 
     if (isset($_GET['id']))
         {
-            $id = $_GET['id'];
-        
             $ad = $adStore[$id];
 
             $formParams = prepareAd($ad, 'Страница редактирования', 'Готово');
@@ -108,14 +109,6 @@
                     
                     header("Location: dz7_1.php");
                 }
-    
            }
 
-        function display_new ($templateName, $formParams, $adStore, $id=null)
-            {
-                require_once ($templateName);
-            }
-            
-
-            
             display_new('layout.php', $formParams, $adStore=(isset($adStore)?$adStore:''), $id=(isset($id))?$id:''); 

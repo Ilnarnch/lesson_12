@@ -9,7 +9,7 @@
 
      if ($formParams['head'] == 'Страница редактирования')
         {
-            echo '<a href="dz7_1.php">Назад</a>';
+            echo '<a href="'.$_SERVER['PHP_SELF'].'">Назад</a>';
         }
        if (!empty($adStore) && $formParams['head'] == 'Страница добавления объявления')  // вывод всех объявлений, содержащихся в куки 
         {    

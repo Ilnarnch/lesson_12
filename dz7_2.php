@@ -55,41 +55,29 @@
                     
                 return $out;
             }
+            
+    function display_new ($templateName, $formParams, $adStore, $id)
+        {
+            require_once($templateName);
+        }
        
     $formParams = prepareAD($data=null, $head = 'Страница добавления объявления', $button = 'Далее');
-     
+          
+    if(file_exists('ad.txt'))
+        {
+            $handle = fopen('ad.txt', 'r');
+            $f_read = fread($handle, filesize('ad.txt'));
+            fclose($handle);
+        }
+           
+    $adStore = (isset($f_read))?unserialize($f_read):[];
     
-   function display($ads) 
-            {
-            ksort($ads);
-                echo '<table>';
-                    foreach ($ads as $id => $idData)
-                        {
-                            echo '<tr>
-                                <td> <a href = "dz7_2.php?id='. $id. '">'. $idData['title'] . '</a>' .' | '. '</td>'. //	При нажатии на «название объявления» на экран выводится шаблон объявления 
-                                '<td>' . $idData['price'] .' руб.'. ' | '. '</td>' .
-                                '<td>' . $idData['seller_name'] . ' | '. '</td>'.
-                                '<td><a href = "dz7_2.php?del='.$id . '">удалить</a>' . "<br>". '</td>'. // При нажатии на «Удалить», объявление удаляется из файла
-                             '</tr>'; 
-                        }
-                echo '</table>';
-            }
-            
-            if(file_exists('ad.txt'))
-                {
-                    $handle = fopen('ad.txt', 'r');
-                    $f_read = fread($handle, filesize('ad.txt'));
-                    
-                    $the_unserialized_array = unserialize($f_read);
-                    
-                    fclose($handle);
-                }
+    $id = (isset($_GET['id']))?$_GET['id']:'';
           
     if (isset($_GET['id']))
         {
-            $id = $_GET['id'];
-            $for_form = $the_unserialized_array[$id];
-            $formParams = prepareAD($for_form, $head = 'Страница редактирования', $button = 'Готово');
+            $ad = $adStore[$id];
+            $formParams = prepareAD($ad, $head = 'Страница редактирования', $button = 'Готово');
         }
     else 
         {   
@@ -97,7 +85,7 @@
                 {
                     $filename = 'ad.txt';
                     $id_for_del = $_GET['del'];
-                    $uns_for_delete = $the_unserialized_array;
+                    $uns_for_delete = $adStore;
                     unset($uns_for_delete[$id_for_del]);
                     $ser = serialize($uns_for_delete);
                     $handle = fopen($filename, 'w+');
@@ -118,18 +106,18 @@
             if (isset($_POST['main_form_submit'])) //	Всё, что пришло из формы записать в файл 'ad.txt' 
                 {                     
                         
-                            $uns = isset($the_unserialized_array)?$the_unserialized_array:array();
+                            $uns = isset($adStore)?$adStore:array();
                             $id = isset($_POST['hidden'])?$_POST['hidden']:'';
                               if (!is_numeric($id))
                                   {
                                     $uns[] = prepareAD($_POST);
-                                    $the_unserialized_array = $uns;                                                                                           
+                                    $adStore = $uns;                                                                                           
                                   }
                                else
                                    {                                   
                                         $uns[$id] = prepareAD($_POST);
                                         $id = '';
-                                        $the_unserialized_array = $uns;
+                                        $adStore = $uns;
                                     }
                                     
                                     $ser = serialize($uns);                              
@@ -143,21 +131,5 @@
                     unset($_POST);
                 }
            }
-
-require_once('form.php');
-
- if ($formParams['head'] == 'Страница редактирования')
-        {
-            echo '<a href="dz7_2.php">Назад</a>';
-        }
-   
-    if (isset($the_unserialized_array) && $formParams['head'] == 'Страница добавления объявления') // вывод всех объявлений, содержащихся в файле
-        {  
-                  $ads = $the_unserialized_array;
-                  display($ads);
-        }
-        
-        if(isset($the_unserialized_array))
-            {
-                unset($the_unserialized_array);
-            }
+                  
+            display_new('layout.php', $formParams, $adStore, $id = (isset($id))?$id:'');                        
