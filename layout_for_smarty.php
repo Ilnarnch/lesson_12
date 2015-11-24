@@ -5,7 +5,8 @@
     header('Content-type: text/html; charset=utf-8');
     
     
-        require_once ('form.php');
+//        require_once ('form.php');
+    echo $view_for_display_new ;
 
      if ($formParams['head'] == 'Страница редактирования')
         {
@@ -13,7 +14,7 @@
         }
        if (!empty($adStore) && $formParams['head'] == 'Страница добавления объявления')  // вывод всех объявлений, содержащихся в куки 
         {    
-            require_once('table.php');
+            require_once('table_for_smarty.php');
         }
  
 

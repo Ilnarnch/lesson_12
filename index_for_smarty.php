@@ -3,6 +3,18 @@
     error_reporting(E_ERROR|E_WARNING|E_PARSE|E_NOTICE);
     ini_set('display_errors',1);
     header('Content-type: text/html; charset=utf-8');
+    
+    $project_root = $_SERVER['DOCUMENT_ROOT'];
+    $smarty_dir = $_SERVER['DOCUMENT_ROOT'].'/smarty/';
+
+    // put full path to Smarty.class.php
+    require($smarty_dir.'/libs/Smarty.class.php');
+    $smarty = new Smarty();
+
+    $smarty->template_dir = $smarty_dir . 'templates';
+    $smarty->compile_dir = $smarty_dir . 'templates_c';
+    $smarty->cache_dir = $smarty_dir . 'cache';
+    $smarty->config_dir = $smarty_dir . 'configs';
 
     $cities = array('641780'=>'Новосибирск','641490'=>'Барабинск','641510'=>'Бердск', // массив для вывода в цикле foreach 
         '641600'=>'Искитим', '641630'=>'Колывань', '641680'=>'Краснообск',  
@@ -56,7 +68,7 @@
                 return $out;
             }
             
-    function display_new ($templateName, $formParams, $adStore, $id)
+    function display_new ($templateName, $formParams, $adStore, $id, $cities, $categories, $view_for_display_new)
         {
             require_once($templateName);
         }
@@ -100,7 +112,7 @@
                             unset($GET['del']);
                         }
                         
-                    header('Location: dz7_2.php');
+                    header('Location: index_for_smarty.php');
                 }
     
             if (isset($_POST['main_form_submit'])) //	Всё, что пришло из формы записать в файл 'ad.txt' 
@@ -131,5 +143,43 @@
                     unset($_POST);
                 }
            }
+           
+           
+           
+           
+    $smarty->assign('formParams', $formParams);
+
+    $smarty->assign('for_radios', array( 
+                                   1 => 'Частное лицо',
+                                   0 => 'Компания'
+                                   ));
+
+    if ($formParams['private'] == 1)
+        { 
+            $for_radios_checked = 1;
+        } 
+    elseif($formParams['private'] == 0) 
+        {
+            $for_radios_checked = 0;
+        }
+
+
+    $smarty->assign('for_radios_checked', $for_radios_checked);
+
+    $smarty->assign('cities', $cities);
+    $smarty->assign('categories',$categories);
+
+    if(isset($id)){                 // условие, чтобы не было ошибки после редактирования объявления
+        $smarty->assign('id',$id);}
+    else{
+        $smarty->assign('id','');
+    }
+
+    $view_for_display_new = $smarty->fetch('index_for_smarty.tpl'); //перехватываем шаблон и помещаем в переменную 
+           
+           
+           
                   
-            display_new('layout.php', $formParams, $adStore, $id = (isset($id))?$id:'');                        
+    display_new('layout_for_smarty.php', $formParams, $adStore, $id = (isset($id))?$id:'', $cities, $categories, $view_for_display_new);  
+            
+            
