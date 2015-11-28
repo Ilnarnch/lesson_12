@@ -67,12 +67,7 @@
                     
                 return $out;
             }
-            
-    function display_new ($templateName, $formParams, $adStore, $id, $cities, $categories, $view_for_display_new)
-        {
-            require_once($templateName);
-        }
-       
+                 
     $formParams = prepareAD($data=null, $head = 'Страница добавления объявления', $button = 'Далее');
           
     if(file_exists('ad.txt'))
@@ -145,14 +140,10 @@
            }
            
            
-           
-           
-    $smarty->assign('formParams', $formParams);
-
-    $smarty->assign('for_radios', array( 
-                                   1 => 'Частное лицо',
-                                   0 => 'Компания'
-                                   ));
+    $for_radios = array( 
+        1 => 'Частное лицо',
+        0 => 'Компания'
+    );
 
     if ($formParams['private'] == 1)
         { 
@@ -163,23 +154,24 @@
             $for_radios_checked = 0;
         }
 
+    $id=(isset($id))?$id:'';                 // условие, чтобы не было ошибки после редактирования объявления
 
-    $smarty->assign('for_radios_checked', $for_radios_checked);
-
-    $smarty->assign('cities', $cities);
-    $smarty->assign('categories',$categories);
-
-    if(isset($id)){                 // условие, чтобы не было ошибки после редактирования объявления
-        $smarty->assign('id',$id);}
-    else{
-        $smarty->assign('id','');
-    }
-
-    $view_for_display_new = $smarty->fetch('index_for_smarty.tpl'); //перехватываем шаблон и помещаем в переменную 
-           
-           
-           
+    
+    $smartyParams = array(                   
+        'formParams' =>$formParams,
+        'adStore' => $adStore,
+        'id' => $id,
+        'cities' => $cities,
+        'categories' => $categories,
+        'for_radios' => $for_radios,
+        'for_radios_checked' => $for_radios_checked
+        
+    );
+    
+    $smarty->assign('smartyParams', $smartyParams);
+     
+    $smarty->display('index_for_smarty.tpl');
                   
-    display_new('layout_for_smarty.php', $formParams, $adStore, $id = (isset($id))?$id:'', $cities, $categories, $view_for_display_new);  
+
             
             
