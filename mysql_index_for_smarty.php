@@ -4,8 +4,8 @@
     ini_set('display_errors',1);
     header('Content-type: text/html; charset=utf-8');
     
-    $project_root = $_SERVER['DOCUMENT_ROOT'];
-    $smarty_dir = $_SERVER['DOCUMENT_ROOT'].'/smarty/';
+//    $project_root = $_SERVER['DOCUMENT_ROOT'];
+    $smarty_dir = /*$_SERVER['DOCUMENT_ROOT'].*/'./smarty/';
 
     // put full path to Smarty.class.php
     require($smarty_dir.'/libs/Smarty.class.php');
@@ -15,10 +15,21 @@
     $smarty->compile_dir = $smarty_dir . 'templates_c';
     $smarty->cache_dir = $smarty_dir . 'cache';
     $smarty->config_dir = $smarty_dir . 'configs';
+        
     
-    $dbc = mysql_connect('localhost', 'ilnar','123') or die('Не удалось подключиться к БД: ') . mysql_error();
-    mysql_select_db('new_database') or die('Не удалось выбрать БД: '). mysql_error();
+    $str=file_get_contents('config.txt');
+    
+    $config = parse_ini_string($str, true); // возвращаем файл config.txt в виде массива
+    
+        $hostName=$config['hostName'];
+        $userName=$config['userName'];
+        $dbPassword=$config['dbPassword'];
+        $dbName=$config['dbName']; 
+    
+    $dbc=mysql_connect($hostName, $userName, $dbPassword) or die('Не удалось подключиться к БД') . mysql_error();
+    mysql_select_db($dbName) or die('Не удалось выбрать БД') . mysql_error();
     mysql_query('set names utf8') or die('Не удалось установить кодировку utf8'). mysql_error();
+
     
     $query = "select category_number, category_name, section from category";
 
@@ -69,6 +80,36 @@
                     
                 return $out;
             }
+            
+    function query ($data,$id)     //функция запросов к БД
+            {   $out='';
+                if(!is_numeric($id))
+                    {
+                        $out="INSERT INTO `adStore` (`private`, `seller_name`, `email`, `phone`, `location_id`, `checkbox`, `category_id`, 
+                            `title`, `description`, `price`, `main_form_submit`, `hidden`)
+                                VALUES ('".$data['private']."'," . "'".$data['seller_name']."',". "'". $data['email']."'," . "'".$data['phone']."'," . "'".$data['location_id']."'," . "'".$checkbox=$data['checkbox']."'," 
+                                    . "'".$data['category_id']."',". "'". $data['title']."'," . "'".$data['description']."',". "'".$data['price']."'," . "'".$data['main_form_submit']."',". "'".$data['hidden']. "');";
+                    }
+                else 
+                    {
+                        $out="UPDATE `adStore` SET
+                                        `private` = '".$data[$id]['private']."',
+                                        `seller_name` = '".$data[$id]['seller_name']."',
+                                        `email` = '".$data[$id]['email']."',
+                                        `phone` = '".$data[$id]['phone']."',
+                                        `location_id` = '".$data[$id]['location_id']."',
+                                        `checkbox` = '".$data[$id]['checkbox']."',
+                                        `category_id` = '".$data[$id]['category_id']."',
+                                        `title` = '".$data[$id]['title']."',
+                                       `description` = '".$data[$id]['description']."',
+                                        `price` = '".$data[$id]['price']."',
+                                        `main_form_submit` = '".$main_form_submit=isset($data[$id]['main_form_submit'])?$data[$id]['main_form_submit']:''."',
+                                        `hidden` = '".$hidden=isset($data[$id]['hidden'])?$data[$id]['hidden']:''."'
+                                         WHERE `id` = '".$id."';";
+                    }    
+                return $out;
+            }        
+            
                                 
     $formParams = prepareAD($data=null, $head = 'Страница добавления объявления', $button = 'Далее');         
 
@@ -109,17 +150,18 @@
                             $id = isset($_POST['hidden'])?$_POST['hidden']:'';
                               if (!is_numeric($id))                        //добавление нового объявления
                                   {
-                                    $uns[] = prepareAD($_POST);
+                                    $uns = prepareAD($_POST);
                                     $adStore = $uns;
                                     
-                                    $query = "INSERT INTO `adStore` (`private`, `seller_name`, `email`, `phone`, `location_id`, `checkbox`, `category_id`, 
-                                        `title`, `description`, `price`, `main_form_submit`, `hidden`)
-                                            VALUES ('".$_POST['private']."'," . "'".$_POST['seller_name']."',". "'". $_POST['email']."'," . "'".$_POST['phone']."'," . "'".$_POST['location_id']."'," . "'".$checkbox=$_POST['checkbox']."'," 
-                                                . "'".$_POST['category_id']."',". "'". $_POST['title']."'," . "'".$_POST['description']."',". "'".$_POST['price']."'," . "'".$_POST['main_form_submit']."',". "'".$_POST['hidden']. "');";
+                                    
+                                    
+                                    $query = query($adStore, $id);
                                     
                                     $result=mysql_query($query) or die('Не удалось выполнить запрос: ') . mysql_error();
                                     
                                     header('Location: mysql_index_for_smarty.php');
+                                    
+                                   
                                   }
                                else
                                    {                                   
@@ -127,21 +169,7 @@
                                         
                                         $adStore = $uns;
                                         
-                                        $query="UPDATE `adStore` SET
-      
-                                                                    `private` = '".$adStore[$id]['private']."',
-                                                                    `seller_name` = '".$adStore[$id]['seller_name']."',
-                                                                    `email` = '".$adStore[$id]['email']."',
-                                                                    `phone` = '".$adStore[$id]['phone']."',
-                                                                    `location_id` = '".$adStore[$id]['location_id']."',
-                                                                    `checkbox` = '".$adStore[$id]['checkbox']."',
-                                                                    `category_id` = '".$adStore[$id]['category_id']."',
-                                                                    `title` = '".$adStore[$id]['title']."',
-                                                                    `description` = '".$adStore[$id]['description']."',
-                                                                    `price` = '".$adStore[$id]['price']."',
-                                                                    `main_form_submit` = '".$main_form_submit=isset($adStore[$id]['main_form_submit'])?$adStore[$id]['main_form_submit']:''."',
-                                                                    `hidden` = '".$hidden=isset($adStore[$id]['hidden'])?$adStore[$id]['hidden']:''."'
-                                                                    WHERE `id` = '".$id."';";
+                                        $query= query($adStore,$id);
                                         $result=mysql_query($query);
                                         $id = '';
                                         
