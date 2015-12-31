@@ -45,7 +45,7 @@
                     }
                 mysql_close($dbc);
                 
-                echo '<a href="mysql_index_for_smarty.php">index.php</a>'; // Ссылка на mysql_index_for_smarty.php
+                echo '<a href="index.php">index.php</a>'; // Ссылка на index.php
 
             }
         else 
