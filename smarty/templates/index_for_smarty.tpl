@@ -25,7 +25,7 @@
                 
                     {foreach from = $smartyParams.cities key=number item=city}
                         <option data-coords= ",," value="{$number}"
-                                {if $city == $smartyParams.formParams.location_id}
+                                {if $number == $smartyParams.formParams.location_id}
                                     selected
                                 {/if}
                                 >{$city} </option>;
