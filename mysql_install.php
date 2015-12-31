@@ -32,7 +32,7 @@
                 file_put_contents($config_file, "dbName=$dbName", FILE_APPEND);
                 
                    
-                $mysql_dump_file = file_get_contents('ads.sql'); // Удаляются таблицы с такими именами, 
+                $mysql_dump_file = file_get_contents('dump_tabels_for_lesson_9.sql'); // Удаляются таблицы с такими именами, 
                                                                 //которые хотим создать и заливаются новые таблицы(через 1 файл дампа)
                 $dbc=mysql_connect($hostName, $userName, $dbPassword) or die('Не удалось подключиться к БД'). mysql_error();
                 
