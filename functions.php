@@ -40,7 +40,7 @@
             
     function categories()
         {
-            $query = "select category_number, category_name, section from category";
+            $query = "SELECT cat.category_number, cat.category_name, sec.section FROM category AS cat INNER JOIN sections AS sec  ON (cat.section_id=sec.section_id)";
 
             $result = mysql_query($query) or die('Запрос не удался'). mysql_error();
 
