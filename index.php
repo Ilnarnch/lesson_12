@@ -57,17 +57,15 @@
                             $id = isset($_POST['hidden'])?$_POST['hidden']:'';
                               if (!is_numeric($id))                        //добавление нового объявления
                                   {
-                                    $uns = prepareAD($_POST);
-                                    $adStore = $uns;
+                                    $adStore = prepareAD($_POST);
                                     save($adStore, $id);                                    
                                     header('Location: index.php');
                                     
                                    
                                   }
                                else
-                                   {                                   
-                                        $uns[$id] = prepareAD($_POST);  // добавление отредактированного объявления                                        
-                                        $adStore = $uns;                                        
+                                   {                                                                             
+                                        $adStore[$id] = prepareAD($_POST); // добавление отредактированного объявления                                       
                                         save($adStore,$id);
                                         $id = '';                                        
                                     }

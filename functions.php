@@ -42,7 +42,7 @@
         {
             $query = "SELECT cat.category_number, cat.category_name, sec.section FROM category AS cat INNER JOIN sections AS sec  ON (cat.section_id=sec.section_id)";
 
-            $result = mysql_query($query) or die('Запрос не удался'). mysql_error();
+            $result = mysqlQuery($query);
 
             while($row = mysql_fetch_assoc($result))
                 {
@@ -54,9 +54,9 @@
         
     function cities()
         {
-            $query = "select * from cities";
+            $query = "SELECT * FROM cities";
     
-            $result=mysql_query($query);
+            $result=mysqlQuery($query);
 
             while($row = mysql_fetch_assoc($result))
                 {
@@ -70,8 +70,8 @@
     function adStore()
         {
             $adStore=array();
-            $query = "select * from adStore";
-            $result=mysql_query($query) or die('Запрос для $adStore не удался: '). mysql_error();
+            $query = "SELECT * FROM adStore";
+            $result=mysqlQuery($query);
 
             while($row=mysql_fetch_assoc($result))
                 {
@@ -106,12 +106,18 @@
                                         `hidden` = '".$hidden=isset($data[$id]['hidden'])?$data[$id]['hidden']:''."'
                                          WHERE `id` = '".$id."';";
                     }    
-                $result=mysql_query($query) or die('Не удалось выполнить запрос: ') . mysql_error();
+                $result=mysqlQuery($query);
             }            
 
     function del ($id_for_del)
         {
             $query="DELETE FROM `adStore`
                 WHERE ((`id` = '".$id_for_del."'));";
-            $result=mysql_query($query);
+            $result=mysqlQuery($query);
         }
+    
+    function mysqlQuery ($q)
+        {
+             $resault=mysql_query($q) or die ('Запрос не удался: ') . mysql_error();
+             return $resault;
+        }    

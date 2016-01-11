@@ -22,7 +22,7 @@
         $userName=$_POST['userName'];
         $dbPassword=$_POST['dbPassword'];
         $dbName=$_POST['dbName'];        
-        if(!empty($hostName) && !empty($userName) && !empty($dbPassword) && !empty($dbName))
+        if(!empty($hostName) && !empty($userName) && !empty($dbName))
             {
                 $config_file='config.txt';                                        // Сохраняются поля формы в отдельный файл
                 
