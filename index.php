@@ -33,6 +33,8 @@
     $formParams = prepareAD($data=null, $head = 'Страница добавления объявления', $button = 'Далее');                  
     $adStore=adStore($dbc);
    
+    $dbc->setLogger('myLogger'); //Логирование запросов
+    $dbc->setErrorHandler('databaseErrorHandler');  // Устанавливаем обработчик ошибок.
     
     $id = (isset($_GET['id']))?$_GET['id']:'';
           
@@ -55,25 +57,22 @@
                         
                             $uns = isset($adStore)?$adStore:array();
                             $id = isset($_POST['hidden'])?$_POST['hidden']:'';
-                              if (!is_numeric($id))                        //добавление нового объявления
-                                  {
-                                    $adStore = prepareAD($_POST);
-                                    save($adStore, $id, $dbc);                                    
-                                    header('Location: index.php');
-                                    
-                                   
-                                  }
-                               else
-                                   {                                                                             
-                                        $adStore[$id] = prepareAD($_POST); // добавление отредактированного объявления                                       
-                                        save($adStore,$id,$dbc);
-                                        $id = '';                                        
-                                    }
-                        
+                            
+                            if (!is_numeric($id)){                        //добавление нового объявления
+                                $adStore = prepareAD($_POST);
+                                postDb($adStore, $dbc);
+                                header('Location: index.php');
+                            }
+                            else{                                                                             
+                                $ad_update = $adStore[$id] = prepareAD($_POST); // добавление отредактированного объявления
+                                updateDb($ad_update, $id, $dbc);
+                                $id = '';                                        
+                            }
+                            
                     unset($_POST);
                 }
            }
-           mysqli_close($dbc);          
+//           mysqli_close($dbc);          
            
     $for_radios = array( 
         1 => 'Частное лицо',
@@ -92,9 +91,9 @@
         'categories' => $categories,
         'for_radios' => $for_radios,
         'for_radios_checked' => $for_radios_checked
-        
     );
     
     $smarty->assign('smartyParams', $smartyParams);
      
     $smarty->display('mysql_index_for_smarty.tpl');
+    
