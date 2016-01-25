@@ -27,11 +27,11 @@
         $dbName=$config['dbName']; 
         
     require_once('functions.php');
-    db_connect($hostName, $userName, $dbPassword, $dbName);
-    $categories=categories();
-    $cities=cities();                                        
+    $dbc=db_connect($hostName, $userName, $dbPassword, $dbName);
+    $categories=categories($dbc);
+    $cities=cities($dbc);                                        
     $formParams = prepareAD($data=null, $head = 'Страница добавления объявления', $button = 'Далее');                  
-    $adStore=adStore();
+    $adStore=adStore($dbc);
    
     
     $id = (isset($_GET['id']))?$_GET['id']:'';
@@ -46,7 +46,7 @@
             if (isset($_GET['del']))  //удаление объявления
                 {             
                     $id_for_del = $_GET['del'];
-                    del($id_for_del);
+                    del($id_for_del, $dbc);
                     header('Location: index.php');
                 }
                 
@@ -58,7 +58,7 @@
                               if (!is_numeric($id))                        //добавление нового объявления
                                   {
                                     $adStore = prepareAD($_POST);
-                                    save($adStore, $id);                                    
+                                    save($adStore, $id, $dbc);                                    
                                     header('Location: index.php');
                                     
                                    
@@ -66,28 +66,21 @@
                                else
                                    {                                                                             
                                         $adStore[$id] = prepareAD($_POST); // добавление отредактированного объявления                                       
-                                        save($adStore,$id);
+                                        save($adStore,$id,$dbc);
                                         $id = '';                                        
                                     }
                         
                     unset($_POST);
                 }
            }
-           mysql_close();          
+           mysqli_close($dbc);          
            
     $for_radios = array( 
         1 => 'Частное лицо',
         0 => 'Компания'
     );
-
-    if ($formParams['private'] == 1)
-        { 
-            $for_radios_checked = 1;
-        } 
-    elseif($formParams['private'] == 0) 
-        {
-            $for_radios_checked = 0;
-        }
+   
+    $for_radios_checked=$formParams['private'];
 
     $id=(isset($id))?$id:'';                 // условие, чтобы не было ошибки после редактирования объявления
     

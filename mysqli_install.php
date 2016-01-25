@@ -32,18 +32,17 @@
                 file_put_contents($config_file, "dbName=$dbName", FILE_APPEND);
                 
                    
-                $mysql_dump_file = file_get_contents('ads.sql'); // Удаляются таблицы с такими именами, 
+                $mysqli_dump_file = file_get_contents('ads.sql'); // Удаляются таблицы с такими именами, 
                                                                 //которые хотим создать и заливаются новые таблицы(через 1 файл дампа)
-                $dbc=mysql_connect($hostName, $userName, $dbPassword) or die('Не удалось подключиться к БД'). mysql_error();
+                $dbc=mysqli_connect($hostName, $userName, $dbPassword, $dbName) or die('Не удалось подключиться к БД'). mysqli_error();
                 
-                mysql_select_db($dbName) or die('Не удалось выбрать БД');
-                $explode_array=explode(';',$mysql_dump_file); 
+                $explode_array=explode(';',$mysqli_dump_file); 
                 
                 foreach($explode_array as $query)
                     {
-                        $result=mysql_query($query) or die ('Запрос не удался').mysql_error(); 
+                        $result=mysqli_query($dbc, $query) or die ('Запрос не удался').mysqli_error(); 
                     }
-                mysql_close($dbc);
+                mysqli_close($dbc);
                 
                 echo '<a href="index.php">index.php</a>'; // Ссылка на index.php
 
@@ -54,3 +53,6 @@
             }    
         
     }
+
+
+

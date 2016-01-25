@@ -6,10 +6,12 @@
     
     function db_connect($hostName, $userName, $dbPassword, $dbName)
         {
-            $dbc=mysql_connect($hostName, $userName, $dbPassword) or die('Не удалось подключиться к БД') . mysql_error();
-            mysql_select_db($dbName) or die('Не удалось выбрать БД') . mysql_error();
-            mysql_query('set names utf8') or die('Не удалось установить кодировку utf8'). mysql_error();
-        }    
+            $dbc=mysqli_connect($hostName, $userName, $dbPassword, $dbName) or die('Не удалось подключиться к БД') . mysqli_error();
+            mysqli_query( $dbc,'set names utf8') or die('Не удалось установить кодировку utf8'). mysqli_error();
+            return $dbc;
+        } 
+        
+         $dbc=db_connect($hostName, $userName, $dbPassword, $dbName);
     
     function prepareAD($data=null, $head=null, $button=null)
             {
@@ -38,13 +40,13 @@
                 return $out;
             }
             
-    function categories()
+    function categories($dbc)
         {
             $query = "SELECT cat.category_number, cat.category_name, sec.section FROM category AS cat INNER JOIN sections AS sec  ON (cat.section_id=sec.section_id)";
 
-            $result = mysqlQuery($query);
+            $result = mysqliQuery($dbc, $query);
 
-            while($row = mysql_fetch_assoc($result))
+            while($row = mysqli_fetch_assoc($result))
                 {
                     $section = $row['section'];
                     $categories[$section][$row['category_number']]=$row['category_name'];
@@ -52,13 +54,13 @@
             return $categories;
         }
         
-    function cities()
+    function cities($dbc)
         {
             $query = "SELECT * FROM cities";
     
-            $result=mysqlQuery($query);
+            $result=mysqliQuery($dbc,$query);
 
-            while($row = mysql_fetch_assoc($result))
+            while($row = mysqli_fetch_assoc($result))
                 {
                     $number = $row['number'];
                     $city = $row['city'];
@@ -67,20 +69,20 @@
             return $cities;    
         }
     
-    function adStore()
+    function adStore($dbc)
         {
             $adStore=array();
             $query = "SELECT * FROM adStore";
-            $result=mysqlQuery($query);
+            $result=mysqliQuery($dbc, $query);
 
-            while($row=mysql_fetch_assoc($result))
+            while($row=mysqli_fetch_assoc($result))
                 {
                     $adStore[$row['id']]=$row;
                 }
             return $adStore;  
         }    
             
-     function save ($data,$id)     //функция запросов к БД
+     function save ($data, $id, $dbc)     //функция запросов к БД
             {   $out='';
                 if(!is_numeric($id))
                     {
@@ -106,18 +108,19 @@
                                         `hidden` = '".$hidden=isset($data[$id]['hidden'])?$data[$id]['hidden']:''."'
                                          WHERE `id` = '".$id."';";
                     }    
-                $result=mysqlQuery($query);
+                $result=mysqliQuery($dbc,$query);
             }            
 
-    function del ($id_for_del)
+    function del ($id_for_del, $dbc)
         {
             $query="DELETE FROM `adStore`
                 WHERE ((`id` = '".$id_for_del."'));";
-            $result=mysqlQuery($query);
+            $result=mysqliQuery($dbc ,$query);
         }
-    
-    function mysqlQuery ($q)
+   
+    function mysqliQuery ($dbc,$q)
         {
-             $resault=mysql_query($q) or die ('Запрос не удался: ') . mysql_error();
+             $resault=mysqli_query($dbc,$q) or die ('Запрос не удался: ') . mysqli_error();
              return $resault;
         }    
+
