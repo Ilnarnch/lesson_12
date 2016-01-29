@@ -21,7 +21,7 @@
             return $dbc;
         } 
         
-         $dbc=db_connect($hostName, $userName, $dbPassword, $dbName);
+    require_once('connect.php');
          
     function prepareAD($data=null, $head=null, $button=null)
             {
@@ -36,6 +36,14 @@
                 $out['title'] = isset($data['title'])?$data['title']:'';
                 $out['description'] = isset($data['description'])?$data['description']:'';
                 $out['price'] = isset($data['price'])?$data['price']:'';
+                
+                if(isset($data['main_form_submit'])){
+                    unset($data['main_form_submit']);    
+                }
+                
+                if(isset($data['hidden'])){
+                    unset($data['hidden']);    
+                }
             
                 if (isset($head))
                     {
@@ -50,10 +58,10 @@
                 return $out;
             }
             
-    function categories($dbc)
-        {
+    function getCategories()
+        { 
+            global $dbc;
             $result=$dbc->select('SELECT cat.category_number, cat.category_name, sec.section FROM category AS cat INNER JOIN sections AS sec  ON (cat.section_id=sec.section_id)');
-            
             foreach($result as $value){
                 $section=$value['section'];
                 $categories[$section][$value['category_number']]=$value['category_name'];
@@ -62,10 +70,10 @@
             
         }
         
-    function cities($dbc)
+    function getCities()
         {
+            global $dbc;
             $result=$dbc->select('SELECT * FROM cities');
-        
             foreach($result as $value){
                 $number=$value['number'];
                 $city = $value['city'];
@@ -75,12 +83,11 @@
             return $cities;    
         }
     
-    function adStore($dbc)
+    function adStore()
         {
+            global $dbc;
             $adStore=array();
-            
             $result=$dbc->select('SELECT * FROM adStore');
-            
             foreach($result as $value){
                 $adStore[$value['id']]=$value;
             }
@@ -88,11 +95,15 @@
             return $adStore;  
         }
         
-    function postDb($adStore, $dbc) {
+    function postDb($adStore) {
+        global $dbc;
         $dbc->query('INSERT INTO adStore SET ?a', $adStore);
     }
 
-    function updateDb ($ad_update, $id, $dbc) {
+    function updateDb ($ad_update, $id) {
+  
+        global $dbc;
+        
         $data_update = [];
         $query_update = '';
         foreach ($ad_update as $key => $value) {
@@ -101,12 +112,12 @@
         $dbc->query('UPDATE adStore SET ?a WHERE id=?d', $data_update, $id);
     }
                     
-    function del ($id_for_del, $dbc)
-        {
+    function del($id_for_del) {
+        global $dbc;
         $dbc->query('DELETE FROM `adStore` WHERE `id` = ?d;', $id_for_del);
-        }
-    
-    // Код обработчика ошибок SQL.
+    }
+
+// Код обработчика ошибок SQL.
     function databaseErrorHandler($message, $info) {
         // Если использовалась @, ничего не делать.
         if (!error_reporting())

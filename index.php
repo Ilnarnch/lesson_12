@@ -4,8 +4,8 @@
     ini_set('display_errors',1);
     header('Content-type: text/html; charset=utf-8');
     
-//    $project_root = $_SERVER['DOCUMENT_ROOT'];
-    $smarty_dir = /*$_SERVER['DOCUMENT_ROOT'].*/'./smarty/';
+    $project_root = __DIR__;   
+    $smarty_dir = $project_root .'./smarty/';
 
     // put full path to Smarty.class.php
     require($smarty_dir.'/libs/Smarty.class.php');
@@ -15,26 +15,14 @@
     $smarty->compile_dir = $smarty_dir . 'templates_c';
     $smarty->cache_dir = $smarty_dir . 'cache';
     $smarty->config_dir = $smarty_dir . 'configs';
-        
-    
-    $str=file_get_contents('config.txt');
-    
-    $config = parse_ini_string($str, true); // возвращаем файл config.txt в виде массива
-    
-        $hostName=$config['hostName'];
-        $userName=$config['userName'];
-        $dbPassword=$config['dbPassword'];
-        $dbName=$config['dbName']; 
-        
+         
     require_once('functions.php');
-    $dbc=db_connect($hostName, $userName, $dbPassword, $dbName);
-    $categories=categories($dbc);
-    $cities=cities($dbc);                                        
+           
+    $categories=getCategories();
+    $cities=getCities();                                        
     $formParams = prepareAD($data=null, $head = 'Страница добавления объявления', $button = 'Далее');                  
-    $adStore=adStore($dbc);
+    $adStore=adStore();
    
-    $dbc->setLogger('myLogger'); //Логирование запросов
-    $dbc->setErrorHandler('databaseErrorHandler');  // Устанавливаем обработчик ошибок.
     
     $id = (isset($_GET['id']))?$_GET['id']:'';
           
@@ -48,31 +36,26 @@
             if (isset($_GET['del']))  //удаление объявления
                 {             
                     $id_for_del = $_GET['del'];
-                    del($id_for_del, $dbc);
+                    del($id_for_del);
                     header('Location: index.php');
                 }
                 
-            if (isset($_POST['main_form_submit'])) //	всё, что пришло из формы записать в БД 
-                {                     
-                        
-                            $uns = isset($adStore)?$adStore:array();
-                            $id = isset($_POST['hidden'])?$_POST['hidden']:'';
-                            
-                            if (!is_numeric($id)){                        //добавление нового объявления
-                                $adStore = prepareAD($_POST);
-                                postDb($adStore, $dbc);
-                                header('Location: index.php');
-                            }
-                            else{                                                                             
-                                $ad_update = $adStore[$id] = prepareAD($_POST); // добавление отредактированного объявления
-                                updateDb($ad_update, $id, $dbc);
-                                $id = '';                                        
-                            }
-                            
-                    unset($_POST);
+            if (isset($_POST['main_form_submit'])) { //	всё, что пришло из формы записать в БД 
+
+                $uns = isset($adStore) ? $adStore : array();
+                $id = isset($_POST['hidden']) ? $_POST['hidden'] : '';
+
+                if (!is_numeric($id)) {                        //добавление нового объявления
+                    $adStore = prepareAD($_POST);
+                    postDb($adStore);
+                } else {
+                    $ad_update = $adStore[$id] = prepareAD($_POST); // добавление отредактированного объявления
+                    updateDb($ad_update, $id);
                 }
-           }
-//           mysqli_close($dbc);          
+
+                header('Location: index.php');
+            }
+        }         
            
     $for_radios = array( 
         1 => 'Частное лицо',

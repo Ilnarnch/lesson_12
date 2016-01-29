@@ -1,5 +1,12 @@
+ 
+    {if is_numeric($smartyParams.id)}
+        {assign var="head" value="Страница редактирования"}
+    {else}
+        {assign var="head" value="Страница добавления объявления"}
+    {/if}
+    
     <form  method="post" action = "{$smarty.server.PHP_SELF}" name = "form_1">
-        <h2>{$smartyParams.formParams.head} </h2>
+        <h2>{$head} </h2>
             <div class="form-row-indented"> 
                 <label class="form-label-radio">
                     {html_radios name="private" options=$smartyParams.for_radios selected=$smartyParams.for_radios_checked separator="<br />"}
@@ -91,13 +98,13 @@
             
         <input type="hidden" name="hidden" value="{if isset($smartyParams.id)}{$smartyParams.id}{/if}">
     </form>
-    {if $smartyParams.formParams.head == 'Страница редактирования'}
+    {if $head == 'Страница редактирования'}
         <a href="{$smarty.server.PHP_SELF}">Назад</a>
     {/if}
     
     {if !empty($smartyParams.adStore)}
         
-        {if $smartyParams.formParams.head == 'Страница добавления объявления'}
+        {if $head == 'Страница добавления объявления'}
             <table>
                 {foreach from=$smartyParams.adStore  key=id item=idData}
                     <tr>
