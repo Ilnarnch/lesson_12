@@ -23,7 +23,7 @@
         
     require_once('connect.php');
          
-    function prepareAD($data=null, $head=null, $button=null)
+    function prepareAD($data=null)
             {
                 $out = array();
                 $out['private'] = isset($data['private'])?$data['private']:'1';
@@ -43,17 +43,7 @@
                 
                 if(isset($data['hidden'])){
                     unset($data['hidden']);    
-                }
-            
-                if (isset($head))
-                    {
-                        $out['head'] = $head;
-                    }
-                
-                 if (isset($button))
-                    {
-                        $out['button'] = $button;
-                    }   
+                } 
                     
                 return $out;
             }

@@ -1,8 +1,10 @@
  
     {if is_numeric($smartyParams.id)}
         {assign var="head" value="Страница редактирования"}
+        {assign var="button" value="Готово"}
     {else}
         {assign var="head" value="Страница добавления объявления"}
+        {assign var="button" value="Далее"}
     {/if}
     
     <form  method="post" action = "{$smarty.server.PHP_SELF}" name = "form_1">
@@ -91,7 +93,7 @@
            
             
         <div class="form-row-indented form-row-submit b-vas-submit" id="js_additem_form_submit">
-            <div class="vas-submit-button pull-left"> <span class="vas-submit-border"></span> <span class="vas-submit-triangle"></span> <input type="submit" value="{$smartyParams.formParams.button}" id="form_submit" name="main_form_submit" class="vas-submit-input"> </div>
+            <div class="vas-submit-button pull-left"> <span class="vas-submit-border"></span> <span class="vas-submit-triangle"></span> <input type="submit" value="{$button}" id="form_submit" name="main_form_submit" class="vas-submit-input"> </div>
         </div>
             
             

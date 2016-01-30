@@ -4,8 +4,8 @@
     ini_set('display_errors',1);
     header('Content-type: text/html; charset=utf-8');
     
-    $project_root = __DIR__;   
-    $smarty_dir = $project_root .'./smarty/';
+//    $project_root = __DIR__;   
+    $smarty_dir = /*$project_root .*/ './smarty/';
 
     // put full path to Smarty.class.php
     require($smarty_dir.'/libs/Smarty.class.php');
@@ -20,7 +20,7 @@
            
     $categories=getCategories();
     $cities=getCities();                                        
-    $formParams = prepareAD($data=null, $head = 'Страница добавления объявления', $button = 'Далее');                  
+    $formParams = prepareAD($data=null);                  
     $adStore=adStore();
    
     
@@ -29,7 +29,7 @@
     if (isset($_GET['id']))
         {
             $ad = $adStore[$id];
-            $formParams = prepareAD($ad, $head = 'Страница редактирования', $button = 'Готово');
+            $formParams = prepareAD($ad);
         }
     else 
         {   
