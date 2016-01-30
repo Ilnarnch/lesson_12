@@ -4,8 +4,8 @@
     ini_set('display_errors',1);
     header('Content-type: text/html; charset=utf-8');
     
-//    $project_root = __DIR__;   
-    $smarty_dir = /*$project_root .*/ './smarty/';
+
+    $smarty_dir = './smarty/';
 
     // put full path to Smarty.class.php
     require($smarty_dir.'/libs/Smarty.class.php');
