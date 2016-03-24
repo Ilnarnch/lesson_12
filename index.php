@@ -5,107 +5,52 @@
     header('Content-type: text/html; charset=utf-8');
     
 
-    $smarty_dir = './smarty/';
-
-    // put full path to Smarty.class.php
-    require($smarty_dir.'/libs/Smarty.class.php');
-    $smarty = new Smarty();
-
-    $smarty->template_dir = $smarty_dir . 'templates';
-    $smarty->compile_dir = $smarty_dir . 'templates_c';
-    $smarty->cache_dir = $smarty_dir . 'cache';
-    $smarty->config_dir = $smarty_dir . 'configs';
-         
-    require_once('functions_oop.php');
     
-    session_start();// сессия для хранения объектов объявлений
-    
-    $categories = array //массив 'секция' => array ('код категории' => 'название категории')
-        ('Транспорт' => array('9' => 'Автомобили с пробегом', '109'=> 'Новые автомобили', '14' => 'Мотоциклы и мототехника', '81' => 'Грузовики и спецтехника', '11' => 'Водный транспорт', '10' => 'Запчасти и аксессуары' ),
-        'Недвижимость' => array('24' => 'Квартиры', '23' => 'Комнаты', '25' => 'Дома, дачи, коттеджи', '26' => 'Земельные участки', 
-            '85' => 'Гаражи и машиноместа', '42' => 'Коммерческая недвижимость', '86' => 'Недвижимость за рубежом'),
-        'Работа' => array('111' => 'Вакансии (поиск сотрудников)', '112' => 'Резюме (поиск работы)'), 
-        'Услуги' => array('114' => 'Предложения услуг', '115' => 'Запросы на услуги'), 
-        'Личные вещи' => array('27' => 'Одежда, обувь, аксессуары','29' => 'Детская одежда и обувь', '30' => 'Товары для детей и игрушки', 
-            '28' => 'Часы и украшения', '88' => 'Красота и здоровье'), 
-        'Для дома и дачи' => array('21' => 'Бытовая техника', '20' => 'Мебель и интерьер', '87' => 'Посуда и товары для кухни',
-            '82' => 'Продукты питания', '19' => 'Ремонт и строительство', '106' => 'Растения'),
-        'Бытовая техника' => array('32' => 'Аудио и видео', '97' => 'Игры, приставки и программы', 
-            '31' => 'Настольные компьютеры', '98' => 'Ноутбуки', '99' => 'Оргтехника и расходники', '96' => 'Планшеты и электронные книги', '84' => 'Телефоны', 
-            '101' => 'Товары для компьютера', '105' => 'Фототехника'),
-        'Хобби' => array('33' => 'Билеты и путешествия', '34' => 'Велосипеды', '83' => 'Книги и журналы', 
-            '36' => 'Коллекционирование', '38' => 'Музыкальные инструменты', '102' => 'Охота и рыбалка', 
-            '39' => 'Спорт и отдых', '103' => 'Знакомства' ),
-        'Животные' => array('89' => 'Собаки', '90' => 'Кошки', '91' => 'Птицы', '92' => 'Аквариум', '93' => 'Другие животные',
-            '94' => 'Товары для животных'),
-        'Для бизнеса' => array('116' => 'Готовый бизнес', '40' => 'Оборудование для бизнеса'));        
-    $cities = array('641780'=>'Новосибирск','641490'=>'Барабинск','641510'=>'Бердск', // массив для вывода в цикле foreach 
-        '641600'=>'Искитим', '641630'=>'Колывань', '641680'=>'Краснообск',  
-        '641710'=>'Куйбышев','641760'=>'Мошково', '641790'=>'Обь', 
-        '641800'=>'Ордынское', '641970'=>'Черепаново', '0'=>'Выбрать другой...',  );
-    
-    $ad = new ad();
-    $formParams = $ad->get_ad($data=null);                  
-    $addAd = new addAd();
-    $adStore=isset($_SESSION['ads'])?$_SESSION['ads']:'';
-    
-    $id = (isset($_GET['id']))?$_GET['id']:'';
-          
-    if (isset($_GET['id']))
-        {
-            $ad = $_SESSION['ads'][$id];
-             $formParams=$ad;
-        }
-    else 
-        {   
-            if (isset($_GET['del']))  //удаление объявления
-                {             
-                    $id_for_del = $_GET['del'];
-                    unset($_SESSION['ads'][$id_for_del]);
-                    
-                    header('Location: index_oop.php');
-                }
-                
-            if (isset($_POST['main_form_submit'])) { //	всё, что пришло из формы записать в сессию
-
-                $id = isset($_POST['hidden']) ? $_POST['hidden'] : '';
-
-                if (!is_numeric($id)) {                        //добавление нового объявления
-                   
-                   $ad ->get_ad($_POST);
-                   $_SESSION['ads'][]=$addAd->get_ad($ad);
-                   $adStore = $_SESSION['ads'];
-            
-                } else {                                       // добавление отредактированного объявления
-                   $ad->get_ad($_POST);
-                   $_SESSION['ads'][$id]=$addAd->get_ad($ad);
-                   $adStore = $_SESSION['ads'];
-                }
-                
-                header('Location: index_oop.php');
-                
-            }
-        }         
-           
-    $for_radios = array( 
-        1 => 'Частное лицо',
-        0 => 'Компания'
-    );
+    require_once('oop.php');                        // подключаем функциями
+    require_once('settings.php');                   // подключаем настройки smarty
+    require_once('connect_mysql.php');              // подключаем соединение с mysql
    
-    $for_radios_checked=$ad->s_private;
-
-//    $id=(isset($id))?$id:'';                 // условие, чтобы не было ошибки после редактирования объявления
     
-    $smartyParams = array(                   
-        'formParams' =>$formParams, // для формы 
-        'adStore' => $adStore, // для вывода объявлений
-        'id' => $id,
-        'cities' => $cities,
-        'categories' => $categories,
-        'for_radios' => $for_radios,
-        'for_radios_checked' => $for_radios_checked
-    );
+    if (isset($_POST['confirm_add'])) {             // если нажата кнопка добавить/сохранить
+        if (is_numeric($_POST['id_r'])) {           // если присутствует метка id_r то сохраняем редактируемое объявление
+            $sql->editAd($db, new ad($_POST));
+        } 
+        else {                                      // иначе добавляем новое объявление
+            $sql->addAd($db, new ad($_POST)); 
+        }   
+       $display->restart();
+    }
     
-    $smarty->assign('smartyParams', $smartyParams);
-     
-    $smarty->display('index_for_smarty_oop.tpl');
+    elseif(isset($_GET['clear_form']) || isset($_GET['back'])){ // кнопки очистить форму и назад вызывают restart();
+        $display->restart();
+    }
+    
+    elseif(isset($_GET['clear_base'])){             // по кнопке очистить базу, удаляем все строки из таблицы ads
+        $sql->clearDB($db);
+        $display->restart();
+    }
+    
+    elseif(isset($_GET['del_ad'])) {                 // ловим ключ del_ad в массиве $_GET - нажата ссылка Удалить
+        if ($sql->getAd($db, (int) ($_GET['del_ad']))){  // если существует объявление с таким ключом удаляем его
+            $sql->delAd($db, (int) ($_GET['del_ad']));
+            $display->restart(); 
+        }
+        else{
+            $display->error();                      // иначе выводим ошибку
+        }
+       
+    }
+    
+    elseif (isset($_GET['click_id'])){             // действие по клику на объявление
+            if($sql->getAd($db, (int) $_GET['click_id'])){   // если объявление с запрашиваемым номером существует
+                $display->displayForm($db, $smarty, $sql, (int) $_GET['click_id']);         // выводим объявление в форму
+            }
+            else{                                 // иначе выводим сообщение о его отсутствии
+                $display->error();
+            }
+    }
+    
+    else{
+            $display->displayForm($db, $smarty, $sql);
+    }    
+?>
