@@ -239,18 +239,18 @@
     if(!empty($_POST['id_c'])){
         $ad_r = new Ads($_POST);
         $ad_r->editAd();
-        header('Location: dz12.php');
+        header('Location: index.php');
     }
     elseif(isset($_POST['name']) && isset($_POST['desc'])){    //сохранение объявления
         $ad = new Ads($_POST);
         $ad->save();
-        header('Location: dz12.php');
+        header('Location: index.php');
     }
     
     if(isset($_GET['id'])){  // удаление объявления
         $ad_d = new Ads($_GET);
         $ad_d->delete();
-        header('Location: dz12.php');
+        header('Location: index.php');
     }
     
     if(isset($_GET['id_c'])){   // подготовка к выводу объявления для редактирования 
