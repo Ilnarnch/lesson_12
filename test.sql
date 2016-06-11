@@ -5,25 +5,27 @@ SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
-DROP TABLE IF EXISTS `ads`;
-CREATE TABLE `ads` (
+DROP TABLE IF EXISTS `adStore`;
+CREATE TABLE `adStore` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `private` tinyint(4) NOT NULL,
+  `type` tinyint(4) NOT NULL,
   `seller_name` varchar(30) DEFAULT NULL,
   `email` varchar(30) DEFAULT NULL,
   `phone` varchar(15) DEFAULT NULL,
   `city_id` int(11) DEFAULT NULL,
   `allow_mail` varchar(4) DEFAULT NULL,
   `category_id` int(4) DEFAULT NULL,
-  `title` varchar(30) DEFAULT NULL,
-  `description` varchar(50) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
   `price` int(11) DEFAULT NULL,
-  `id_r` int(11) DEFAULT NULL,
+  `desc` text,
+  `id_c` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `ads` (`id`, `private`, `seller_name`, `email`, `phone`, `city_id`, `allow_mail`, `category_id`, `title`, `description`, `price`, `id_r`) VALUES
-(21,	1,	'seller_name',	'123@ya.ru',	'+7927...',	641490,	'Yes',	81,	'title',	'dfg',	1111,	NULL);
+INSERT INTO `adStore` (`id`, `type`, `seller_name`, `email`, `phone`, `city_id`, `allow_mail`, `category_id`, `name`, `price`, `desc`, `id_c`) VALUES
+(90,	0,	'seller_name_two',	'234@email.com',	'+7909...',	641600,	'Yes',	81,	'title_two',	2222,	'two_desc',	90),
+(89,	1,	'seller_name',	'123@ya.ru',	'+7927...',	641600,	'Yes',	81,	'title_one',	1111,	'desc',	NULL)
+ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `type` = VALUES(`type`), `seller_name` = VALUES(`seller_name`), `email` = VALUES(`email`), `phone` = VALUES(`phone`), `city_id` = VALUES(`city_id`), `allow_mail` = VALUES(`allow_mail`), `category_id` = VALUES(`category_id`), `name` = VALUES(`name`), `price` = VALUES(`price`), `desc` = VALUES(`desc`), `id_c` = VALUES(`id_c`);
 
 DROP TABLE IF EXISTS `categories`;
 CREATE TABLE `categories` (
@@ -86,7 +88,8 @@ INSERT INTO `categories` (`id`, `category`, `parent_id`) VALUES
 (93,	'Другие животные',	'9'),
 (94,	'Товары для животных',	'9'),
 (116,	'Готовый бизнес',	'Для бизнеса'),
-(40,	'Оборудование для бизнеса',	'Для бизнеса');
+(40,	'Оборудование для бизнеса',	'Для бизнеса')
+ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `category` = VALUES(`category`), `parent_id` = VALUES(`parent_id`);
 
 DROP TABLE IF EXISTS `cities`;
 CREATE TABLE `cities` (
@@ -106,19 +109,8 @@ INSERT INTO `cities` (`id`, `city`) VALUES
 (641790,	'Обь'),
 (641800,	'Ордынское'),
 (641970,	'Черепаново'),
-(641780,	'Новосибирск');
-
-INSERT INTO `departments` (`id`, `name`) VALUES
-(1,	'Финансовый'),
-(2,	'Почтовый '),
-(3,	'Доставка'),
-(101,	'post'),
-(110,	'Уборка'),
-(303,	'postwt');
-
-INSERT INTO `new_table` (`id`, `column`) VALUES
-(1,	'wer'),
-(9,	'value_111');
+(641780,	'Новосибирск')
+ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `city` = VALUES(`city`);
 
 DROP TABLE IF EXISTS `sections`;
 CREATE TABLE `sections` (
@@ -136,17 +128,7 @@ INSERT INTO `sections` (`parent_id`, `section`) VALUES
 (6,	'Для дома и дачи'),
 (7,	'Бытовая техника'),
 (8,	'Хобби'),
-(9,	'Животные');
+(9,	'Животные')
+ON DUPLICATE KEY UPDATE `parent_id` = VALUES(`parent_id`), `section` = VALUES(`section`);
 
-INSERT INTO `users` (`id`, `first_name`, `last_name`, `phone`, `department`) VALUES
-(1,	'Ильнар ',	'Гарифуллин',	'123',	1),
-(2,	'Андрей ',	'Иванов',	'234567',	3),
-(3,	'Иванов',	'Алексей',	'Викторович',	3),
-(4,	'1_user',	'1_lastname',	'1_11111',	1),
-(5,	'2_user',	'2_lastname',	'2_22222',	2),
-(9,	'3_user',	'3_lastname',	'3_22222',	3),
-(8,	'3_user',	'3_lastname',	'3_22222',	3),
-(10,	'3_user',	'3_lastname',	'3_22222',	3),
-(11,	'3_user',	'3_lastname',	'3_22222',	3);
-
--- 2016-03-24 11:12:20
+-- 2016-06-11 09:02:36
