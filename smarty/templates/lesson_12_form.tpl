@@ -104,11 +104,17 @@
         <input type="hidden" name="id_c" value="{if isset($ad_c)}{$ad_c->getId()}{/if}">
   
    
-             <div class="col-sm-offset-1 col-sm-10">
+{*             <div class="col-sm-offset-1 col-sm-10">
                  <button type="submit" class="btn btn-default">Отправить</button>
-             </div>
+             </div>*}
          </div>    
-     </form>
-        
-        
+   
+    <div class="col-sm-offset-1 col-sm-10">
+        <button type="submit" class="btn btn-default">{if isset($smarty.get.id_c)}Сохранить{else}Добавить{/if} объявление </button>
+    </div>
+    
+    <div class="col-sm-offset-1 col-sm-10">
+        {if isset($smarty.get.id_c)}<button type="submit" name="back" class="btn btn-default">Назад</button>{/if} 
+    </div>
+     </form> 
     {include file='table.tpl'}
